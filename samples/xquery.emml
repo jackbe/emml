@@ -1,0 +1,50 @@
+<!-- This work is licensed under a Creative Commons Attribution-Share Alike 3.0 United States License. 
+	 See http://creativecommons.org/licenses/by-sa/3.0/us for the full text. -->
+
+
+<mashup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.openmashup.org/schemas/v1.0/EMML/../schemas/EMMLSpec.xsd"
+        xmlns="http://www.openmashup.org/schemas/v1.0/EMML"
+ name="XQueryService">
+        <emml-meta name="author">Raj Krishnamurthy(raj@jackbe.com)</emml-meta>
+    
+        <output name="groupedResult" type="document"/>
+        <variables>
+            <variable name="feed" type="document">
+                    <rss>
+                        <channel>
+                            <item><author name="Pike"/></item>
+                            <item><author name="Kernigham"/></item>
+                            <item><author name="Gosling"/></item>
+                            <item><author name="Pike"/></item>
+                            <item><author name="Kernigham"/></item>
+                            <item><author name="Stroustrup"/></item>
+                        </channel>
+                    </rss>
+            </variable>
+            <variable name="cnt" type="number"/>
+            <variable name="i" type="number"/>
+            <variable name="nm" type="string" />
+        </variables>
+
+            <display message="feed = " variable="feed"/>
+
+            <constructor outputvariable="groupedResult">
+                <![CDATA[
+                    <authors> {
+                        for  $i  in distinct-values($feed//author/@name)
+                        let $cnt := count($feed//author[@name=$i])
+                        return <author name="{$i}" itemsCount="{$cnt}">data </author>
+                    } </authors>
+                ]]>
+            </constructor>
+
+            <assign outputvariable="nm" fromexpr="$groupedResult/authors/author[1]/@name"/>
+            <display message="nm = " expr="$nm"/>
+
+            <display message="sample expr1 = ...."  expr="$groupedResult//author//@name/string()"/>
+            <display message="sample expr2 = ...."  expr="$groupedResult/authors/author[1]/@name"/>
+            <display message="sample expr3 = ...."  expr="$groupedResult//author[3]/@name/string()"/>
+
+            <display message="grouped result = ...."  expr="$groupedResult"/>
+</mashup>

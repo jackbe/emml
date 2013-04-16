@@ -1,0 +1,68 @@
+<!-- This work is licensed under a Creative Commons Attribution-Share Alike 3.0 United States License. 
+	 See http://creativecommons.org/licenses/by-sa/3.0/us for the full text. -->
+
+
+<mashup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.openmashup.org/schemas/v1.0/EMML/../schemas/EMMLSpec.xsd"
+        xmlns="http://www.openmashup.org/schemas/v1.0/EMML"
+        xmlns:myfunc="java:org.oma.emml.utils.EMMLFunctions"
+        xmlns:sutils="java:org.apache.commons.lang.StringUtils"
+        name="UserDefinedFunctionSample">
+
+       <emml-meta name="author">Raj Krishnamurthy(raj@jackbe.com)</emml-meta>
+   
+       <input name="param" type="document">
+           <data>
+               <item><name>test1</name></item>
+               <item><name>data2</name></item>
+               <item><name>test3</name></item>
+               <item><name>data4</name></item>
+               <item><name>data-5</name></item>
+               <item><name>data.6</name></item>
+               <item><name>data-6-6</name></item>
+               <item><name>5-6-data-6-6</name></item>
+           </data>
+       </input>
+       <output name="result" type="document"/>
+
+       <!-- EMML User-defined functions are public java methods. The java class name hosting these functions
+            must be specified using java namespace i.e.
+            xmlns:myfunc="java:com.jackbe.jbp.jems.client.EMMLPrestoFunctions"
+
+            EMML User-defined functions provides ability to encapsulate re-usable logic in a java method
+            and be re-used in any EMML statement/expression.
+
+       -->
+       <filter inputvariable="param"
+               filterexpr = "/data/item[myfunc:soundex(name, 'data')]"
+               outputvariable="result"/>
+
+        <!-- invokes function to Capitalize given string -->
+        <display message="capitalize = " expr="sutils:capitalize('hello')"/>
+
+        <annotate variable="result" expr="/data">
+            element capitalize { sutils:capitalize('hello') }
+        </annotate>
+
+        <!-- invokes function to reverse given string -->
+        <display message="reverse = " expr="sutils:reverse('hello')"/>
+        <annotate variable="result" expr="/data">
+           element reverse { sutils:reverse('hello') }
+        </annotate>
+
+       <!-- invokes function to determine if number  -->
+       <display message="isNumeric = " expr="sutils:isNumeric('101')"/>
+
+       <annotate variable="result" expr="/data">
+          element isNumeric { sutils:isNumeric('101') }
+       </annotate>
+
+       <!-- invokes function to trim & concat  -->
+        <display message="trim = " expr="concat(sutils:trim('                        Hello        '), ' world')"/>
+       <annotate variable="result" expr="/data">
+          element trim { concat(sutils:trim('                        Hello        '), ' world') }
+       </annotate>
+
+
+</mashup>
+

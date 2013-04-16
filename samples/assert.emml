@@ -1,0 +1,127 @@
+<mashup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openmashup.org/schemas/v1.0/EMML/../schemas/EMMLPrestoSpec.xsd"
+  	xmlns="http://www.openmashup.org/schemas/v1.0/EMML"
+  	xmlns:emml="http://www.openmashup.org/schemas/v1.0/EMML"
+  	xmlns:macro="http://www.openmashup.org/schemas/v1.0/EMMLMacro"
+	xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    name="AssertSample"  >
+    
+    <emml-meta name="author">Satya Prakash(satya.prakash@jackbe.com)</emml-meta>
+    
+    <variable name="email1" type="string" default="jackbe.team@gmail.com" />
+    <variable name="email2" type="string" default="jackbe.team@gmail.com" />
+	<variable name="email3" type="string" default="jackbejack@hotmail.com" />
+	
+	<assert actualvar="email1" expectedvar="email2" equals="true"/>
+	<assert actualvar="email2" expectedvar="email3" equals="false"/>
+	
+	<variable name="int1" type="number" default="10" />
+	<variable name="int2" type="number" default="10" />
+	<variable name="int3" type="number" default="25" />
+	
+	<assert actualvar="int1" expectedvar="int2" equals="true"/>
+	<assert actualvar="int2" expectedvar="int3" equals="false"/>
+	
+	<variable name="bool1" type="boolean" default="true" />
+	<variable name="bool2" type="boolean" default="true" />
+	<variable name="bool3" type="boolean" default="false" />
+	
+	<assert actualvar="bool1" expectedvar="bool2" equals="true"/>
+	<assert actualvar="bool2" expectedvar="bool3" equals="false"/>
+	
+    
+        <variable name="doc1" type="document">
+                <matches>
+                    <match>
+                        <team1>India</team1>
+                        <team2>Bermuda</team2>
+                        <venue>Trinidad</venue>
+                    </match>
+                    <match>
+                        <team1>India</team1>
+                        <team2>Sri Lanka</team2>
+                        <venue>Port of Spain</venue>
+                    </match>
+                    <match>
+                        <team1>England</team1>
+                        <team2>Canada</team2>
+                        <venue>St Lucia</venue>
+                    </match>
+                </matches>
+        </variable>
+        <variable name="doc2" type="document">
+                <bets>
+                     <odd>
+                        <for-it>15</for-it>
+                        <against>30</against>
+                    </odd>
+                    <odd>
+                        <for-it>25</for-it>
+                        <against>20</against>
+                    </odd>
+                    <odd>
+                        <for-it>18</for-it>
+                        <against>30</against>
+                    </odd>
+                </bets>
+        </variable>
+
+        <variable name="doc3" type="document">
+                 <odd>
+                     <for-it>18</for-it>
+                     <against>30</against>
+                 </odd>
+        </variable>
+        
+         <variable name="doc4" type="document">
+                <matches>
+                    <match>
+                        <team1>India</team1>
+                        <team2>Bermuda</team2>
+                        <venue>Trinidad</venue>
+                    </match>
+                    <match>
+                        <team1>India</team1>
+                        <team2>Sri Lanka</team2>
+                        <venue>Port of Spain</venue>
+                    </match>
+                    <match>
+                        <team1>England</team1>
+                        <team2>Canada</team2>
+                        <venue>St Lucia</venue>
+                    </match>
+                </matches>
+        </variable>
+        
+        <variable name="doc5" type="document">
+                <matches>
+                    <match>
+                        <team1>England</team1>
+                        <team2>Canada</team2>
+                        <venue>St Lucia</venue>
+                    </match>
+                    <match>
+                        <team1>India</team1>
+                        <team2>Sri Lanka</team2>
+                        <venue>Port of Spain</venue>
+                    </match>
+                </matches>
+        </variable>
+        
+
+		
+		<assert actualexpr="$doc2/bets/odd[last()]" expectedvar="doc3" equals="true"/>
+		
+		<assert actualexpr="$doc1/matches/match[last()]" expectedexpr="$doc5/matches/match[position()=1]" equals="true"/>
+		
+		<assert actualexpr="$doc2/bets/odd" count="3" equals="true"/>
+		
+		<assert actualexpr="$doc2/bets/odd" elementdepth="2" equals="true"/>
+		
+		<assert actualvar="int1" literal="10" equals="true"/>
+		
+		<assert actualexpr="$doc2/bets/odd[last()]/against/text()" literal="30" equals="true"/>
+		
+		<assert actualexpr="string($doc4/matches/match[position()=2]/team1)" expectedexpr="string($doc5/matches/match[position()=2]/team1)" equals="true"/>
+
+</mashup>

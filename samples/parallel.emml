@@ -1,0 +1,60 @@
+<!-- This work is licensed under a Creative Commons Attribution-Share Alike 3.0 United States License. 
+	 See http://creativecommons.org/licenses/by-sa/3.0/us for the full text. -->
+
+
+<mashup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.openmashup.org/schemas/v1.0/EMML/../schemas/EMMLSpec.xsd"
+        xmlns="http://www.openmashup.org/schemas/v1.0/EMML"
+ name="ParallelService">
+        <emml-meta name="author">Raj Krishnamurthy(raj@jackbe.com)</emml-meta>
+    
+    <output name="result" type="document"/>
+    <variables>
+        <variable name="keywords"  type="document"/>
+        <variable name="appId" type="string" default="YahooDemo"/>
+        <variable name="searchText" type="string" default="Italian sculptors and painters of the renaissance favored the Virgin Mary for inspiration"/>
+        <variable name="searchText2" type="string" default="Cricket is an interesting game played between teams of 11 players each and is very exicting and fun to watch"/>
+        <variable name="query" type="string" default="madonna"/>
+        <variable name="keywords2"  type="document"/>
+    </variables>
+
+    <!-- Invokes Multiple services in parallel and consolidates their output -->
+      <!-- EMML variables have a single, global scope. Hence variables in each sequence block need to use
+      unique names -->
+      <parallel>
+        <sequence>
+            <directinvoke endpoint="http://search.yahooapis.com/ContentAnalysisService/V1/termExtraction"
+                        method="post"
+                        appid="$appId"
+                        context="$searchText"
+                        query="$query"
+                        timeout="10"
+                        onerror="continue"
+                        outputvariable = "keywords" />
+
+            <display message="keywords1 = " variable="$keywords"/>
+        </sequence>
+
+        <sequence>
+            <directinvoke endpoint="http://search.yahooapis.com/ContentAnalysisService/V1/termExtraction"
+                    method="post"
+                    appid="$appId"
+                    context="$searchText2"
+                    query="team"
+                    timeout="10"
+                    onerror="continue"
+                    outputvariable = "keywords2" />
+
+            <display message="keywords2 = " variable="$keywords2"/>
+
+        </sequence>
+    </parallel>
+
+     <!-- consolidate results from each service in a single document -->   
+     <constructor outputvariable="result">
+            <mykeywords>
+                {$keywords}
+                {$keywords2}
+            </mykeywords>
+     </constructor>
+</mashup>

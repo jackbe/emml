@@ -1,0 +1,28 @@
+<!-- This work is licensed under a Creative Commons Attribution-Share Alike 3.0 United States License. 
+	 See http://creativecommons.org/licenses/by-sa/3.0/us for the full text. -->
+
+
+<mashup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.openmashup.org/schemas/v1.0/EMML/../schemas/EMMLSpec.xsd"
+        xmlns="http://www.openmashup.org/schemas/v1.0/EMML"
+ name="FaultHandlingSample">
+        <emml-meta name="author">Raj Krishnamurthy(raj@jackbe.com)</emml-meta>
+
+		<!-- Use faultcode and faultmessage variables to handle errors -->
+        <output name="result" type="document"/>
+
+		<!-- Invoke fictious service & continue on error -->
+		<directinvoke endpoint="http://unknown.svc" onerror="continue" outputvariable="result"/>
+
+        <if condition="$faultcode = -1">
+            <!-- Create Error document OR Invoke an alternate failover service -->
+            <constructor outputvariable="result">
+                <Status>{$faultmessage}. Failing over to alternate service</Status>
+            </constructor>
+
+        <else>
+            <!-- Success processing -->
+		</else>
+
+        </if>
+</mashup>

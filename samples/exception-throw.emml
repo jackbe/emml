@@ -1,0 +1,68 @@
+<mashup xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+  xsi:schemaLocation='http://www.openmashup.org/schemas/v1.0/EMML/../schemas/EMMLPrestoSpec.xsd'
+  xmlns='http://www.openmashup.org/schemas/v1.0/EMML'
+  xmlns:macro='http://www.openmashup.org/schemas/v1.0/EMMLMacro'
+  xmlns:presto='http://www.jackbe.com/v1.0/EMMLPrestoExtensions'
+  name='ThrowExceptionSample'>
+
+  <output name='result' type='document' />
+    
+  
+	<try>
+		<!-- throw any XML document as exception document -->
+	   <throw>
+			<MyMashupException/>
+	   </throw>
+       
+	   <catch type="MyMashupException e">
+          <display message="caught my exception : " expr="$e" />
+       </catch>  	   
+    </try>
+
+
+	<try>
+		<!-- throw any XML document as exception document -->
+	   <throw>
+			<MyMashupException>
+				<code>1010</code>
+				<message>Houston, we have a problem</message>	
+			</MyMashupException>	
+	   </throw>
+       
+	   <catch type="MyMashupException e">
+          <display message="caught my exception : " expr="$e//message" />
+       </catch>  	   
+    </try>
+
+	<!-- local macro definition : throws exception on invalid arguments -->
+   	<macro name="StringJoin">
+		<input name="inputexpr" type="string" />
+		<output name="stringResult" type="string" />
+
+		<if condition="empty({$inputexpr})">		
+		   <throw>
+				<IllegalArgumentException/>
+		   </throw>
+		</if>   
+		<assign fromexpr="string-join({$inputexpr}, ', ')" outputvariable="stringResult"/>
+   	</macro>
+	
+    <variable name="mydoc" type="document">
+        <items>
+            <item>foo1</item>
+            <item>foo2</item>
+            <item>foo3</item>
+        </items>
+    </variable>
+    <variable name="myresult" type="string"/>
+
+	<!-- call exception throwing macro -->	
+    <try>
+      	<macro:StringJoin inputexpr="$mydoc//non-existent-item" stringResult="result"/>
+	    <catch type="IllegalArgumentException e">
+	      		<display message="StringJoin macro exception : " expr="$e" />
+	    </catch>  
+    </try>
+
+
+</mashup>

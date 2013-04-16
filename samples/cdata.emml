@@ -1,0 +1,43 @@
+
+<!-- This work is licensed under a Creative Commons Attribution-Share Alike 3.0 United States License. 
+	 See http://creativecommons.org/licenses/by-sa/3.0/us for the full text. -->
+
+
+<mashup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.openmashup.org/schemas/v1.0/EMML/../schemas/EMMLSpec.xsd"
+        xmlns="http://www.openmashup.org/schemas/v1.0/EMML"
+     name="KMLCdataEncoding">
+    <emml-meta name="author">Raj Krishnamurthy(raj@jackbe.com)</emml-meta>
+
+	<!-- output-cdata-section-elements specify elements to be wrapped in cdata section.  Elements are space-delimited in {uri}name format -->
+
+    <output name="result" type="document" output-cdata-section-elements="{http://www.opengis.net/kml/2.2}text {http://www.opengis.net/kml/2.2}bgColor"/>
+
+	<constructor outputvariable="result"> 
+			<kml xmlns="http://www.opengis.net/kml/2.2">
+				<document>
+					<Style id="medSporeCountBalloon">
+						<BalloonStyle>
+							<bgColor>#EBFFEB</bgColor>
+							<text><![CDATA[<h1>some html content etc</h1>]]></text>
+						</BalloonStyle>
+					</Style>
+				</document>
+			</kml>
+    </constructor> 
+
+
+	<!-- sample output. Note bgColor, text elements.
+		<kml xmlns="http://www.opengis.net/kml/2.2">
+		<document>
+		<Style id="medSporeCountBalloon">
+		<BalloonStyle>
+				<bgColor><![CDATA[#EBFFEB]]></bgColor>
+				<text><![CDATA[<h1>some html content etc</h1>]]></text>
+		</BalloonStyle>
+		</Style>
+		</document>
+		</kml>
+	-->
+
+</mashup>

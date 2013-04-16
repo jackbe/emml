@@ -1,0 +1,32 @@
+<!-- This work is licensed under a Creative Commons Attribution-Share Alike 3.0 United States License. 
+	 See http://creativecommons.org/licenses/by-sa/3.0/us for the full text. -->
+
+
+
+<mashup name="GeoAnnotationSample"
+		xsi:schemaLocation="http://www.openmashup.org/schemas/v1.0/EMML/../schemas/EMMLSpec.xsd"
+       	xmlns="http://www.openmashup.org/schemas/v1.0/EMML"
+       	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       	xmlns:y="urn:yahoo:maps"
+		xmlns:macro = "http://www.openmashup.org/schemas/v1.0/EMMLMacro"
+       	xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#">
+
+        <emml-meta name="author">Raj Krishnamurthy(raj@jackbe.com)</emml-meta>
+
+        <!-- geo annotate a given input document containing address(i.e. having city, state, zip elements) -->
+        <input name="location" type="document">
+            <address>
+                      <city>walnut creek</city>
+                      <state>CA</state>
+                      <zip>94597</zip>
+              </address>
+          </input>
+
+        <output name="annotatedlocation" type="document"/>
+
+	  <macro:GeoAnnotater location="$location" macroResult="annotatedlocation"></macro:GeoAnnotater>
+
+        
+</mashup>
+
+

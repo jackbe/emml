@@ -1,0 +1,45 @@
+<!-- This work is licensed under a Creative Commons Attribution-Share Alike 3.0 United States License. 
+	 See http://creativecommons.org/licenses/by-sa/3.0/us for the full text. -->
+
+<mashup name="TwitterJsonHandlingSample" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openmashup.org/schemas/v1.0/EMML ../schemas/EMMLPrestoSpec.xsd" xmlns="http://www.openmashup.org/schemas/v1.0/EMML">  
+   <output name="mashupResponse" type="string"/>
+
+	<input name="query" type="string" default="cricket"/> 
+
+   	<variable name="jsonStr" type="document" subtype="json" />
+
+	<directinvoke endpoint="http://search.twitter.com/search.json?q={$query}" 
+		outputvariable="jsonStr"/>
+
+	<script type="text/javascript" inputvariables="jsonStr" outputvariable="mashupResponse">
+	<![CDATA[
+		var jsonObj = JSON.parse(jsonStr);
+
+		var resultObj = {};
+		resultObj["tweets"] = []
+
+		jsonObj.results.forEach(function(e,i,a) {
+			var tweet = {};
+
+			var d = new Date(e.created_at);
+			print(d.toJSON());
+			tweet['created_at'] = d.toUTCString();
+
+			tweet['text'] = e.text;
+			tweet['username'] = e.from_user_name;
+			resultObj.tweets[i] = tweet;
+		}
+		);
+
+		var users = jsonObj.results.map( 
+			function(e) { return e.from_user_name; }
+		);
+		resultObj["users"] = users
+
+		mashupResponse = JSON.stringify(resultObj);
+
+	]]>
+	</script>
+
+	<display console="true" message="mashupResponse = " expr="$mashupResponse" />	
+</mashup>

@@ -1,0 +1,138 @@
+<!-- This work is licensed under a Creative Commons Attribution-Share Alike 3.0 United States License. 
+	 See http://creativecommons.org/licenses/by-sa/3.0/us for the full text. -->
+
+
+<mashup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openmashup.org/schemas/v1.0/EMML/../schemas/EMMLSpec.xsd"
+	xmlns="http://www.openmashup.org/schemas/v1.0/EMML"
+	name="GroupStocks">
+
+        <emml-meta name="author">Satya Prakash(satya.prakash@jackbe.com)</emml-meta>
+	
+				<output name="groupedResult" type="document" />
+		<variables>
+			<variable name="stockquotes" type="document">
+<GetTop>
+    <Top>
+        <Outcome>Success</Outcome>
+        <Delay>0</Delay>
+        <Symbol>DRYS</Symbol>
+        <Exchange>NASDAQ</Exchange>
+        <Type>Most Active</Type>
+        <Name>DRYSHIPS INC.</Name>
+        <Last>5.44</Last>
+        <Change>-0.08</Change>
+        <PercentChange>-1.45</PercentChange>
+        <Volume>11470872</Volume>
+    </Top>
+    <Top>
+        <Outcome>Success</Outcome>
+        <Delay>0</Delay>
+        <Symbol>SBUX</Symbol>
+        <Exchange>NASDAQ</Exchange>
+        <Type>Most Active</Type>
+        <Name>STARBUCKS CORPORATION</Name>
+        <Last>22.6</Last>
+        <Change>0.04</Change>
+        <PercentChange>0</PercentChange>
+        <Volume>7875376</Volume>
+    </Top>
+    <Top>
+        <Outcome>Success</Outcome>
+        <Delay>0</Delay>
+        <Symbol>FNM-G</Symbol>
+        <Exchange>NYSE</Exchange>
+        <Type>Leading Losers</Type>
+        <Name>FANNIE MAE</Name>
+        <Last>1.29</Last>
+        <Change>-0.05</Change>
+        <PercentChange>-3.73</PercentChange>
+        <Volume>3400</Volume>
+    </Top>
+    <Top>
+        <Outcome>Success</Outcome>
+        <Delay>0</Delay>
+        <Symbol>ACH</Symbol>
+        <Exchange>NYSE</Exchange>
+        <Type>Leading Losers</Type>
+        <Name>ALUMINUM CORPORATION OF CHINA LTD</Name>
+        <Last>23.69</Last>
+        <Change>-0.91</Change>
+        <PercentChange>-3.7</PercentChange>
+        <Volume>920546</Volume>
+    </Top>
+    <Top>
+        <Outcome>Success</Outcome>
+        <Delay>0</Delay>
+        <Symbol>ALU</Symbol>
+        <Exchange>NYSE</Exchange>
+        <Type>Leading Losers</Type>
+        <Name>ALCATEL-LUCENT</Name>
+        <Last>2.69</Last>
+        <Change>-0.1</Change>
+        <PercentChange>-3.58</PercentChange>
+        <Volume>38412791</Volume>
+    </Top>
+    <Top>
+        <Outcome>Success</Outcome>
+        <Delay>0</Delay>
+        <Symbol>SPY</Symbol>
+        <Exchange>AMEX</Exchange>
+        <Type>Most Active</Type>
+        <Name>SPDR S&amp;P 500</Name>
+        <Last>108.04</Last>
+        <Change>-0.09</Change>
+        <PercentChange>0</PercentChange>
+        <Volume>304622050</Volume>
+    </Top>
+    <Top>
+        <Outcome>Success</Outcome>
+        <Delay>0</Delay>
+        <Symbol>XLF</Symbol>
+        <Exchange>AMEX</Exchange>
+        <Type>Most Active</Type>
+        <Name>SECTOR SPDR TRUST</Name>
+        <Last>13.95</Last>
+        <Change>0.01</Change>
+        <PercentChange>0</PercentChange>
+        <Volume>101870169</Volume>
+    </Top>
+    <Top>
+        <Outcome>Success</Outcome>
+        <Delay>0</Delay>
+        <Symbol>FAZ</Symbol>
+        <Exchange>AMEX</Exchange>
+        <Type>Most Active</Type>
+        <Name>DIREXION FINANCIAL BEAR 3X SHARES</Name>
+        <Last>20.55</Last>
+        <Change>-0.03</Change>
+        <PercentChange>0</PercentChange>
+        <Volume>72156019</Volume>
+    </Top>
+    <Top>
+        <Outcome>Success</Outcome>
+        <Delay>0</Delay>
+        <Symbol>SDS</Symbol>
+        <Exchange>AMEX</Exchange>
+        <Type>Most Active</Type>
+        <Name>PROSHARES ULTRASHORT S&amp;P500</Name>
+        <Last>36.89</Last>
+        <Change>0.08</Change>
+        <PercentChange>0</PercentChange>
+        <Volume>54971844</Volume>
+    </Top>   
+</GetTop>
+			</variable>
+		</variables>
+
+
+		<group outputvariable="groupedResult"
+			by="$stockquotes//GetTop/Top/Exchange">
+			<MyGroup>
+				<Exchange name="{$group_key}" Volume="{sum(Volume)}">
+					{$group_id}
+				</Exchange>
+			</MyGroup>
+		</group>
+
+</mashup>

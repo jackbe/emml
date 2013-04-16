@@ -1,0 +1,81 @@
+<!-- This work is licensed under a Creative Commons Attribution-Share Alike 3.0 United States License. 
+	 See http://creativecommons.org/licenses/by-sa/3.0/us for the full text. -->
+
+
+<mashup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.openmashup.org/schemas/v1.0/EMML/../schemas/EMMLSpec.xsd"
+        xmlns="http://www.openmashup.org/schemas/v1.0/EMML"
+	    name="SortSample">
+
+    <emml-meta name="author">Raj Krishnamurthy(raj@jackbe.com)</emml-meta>
+	<input name="mydocument" type="document">
+	
+		<Contact-Info>
+			<Contact>
+				<Name>Robert Langdon</Name>
+				<Number>9191999</Number>
+				<DOB>28-01-1980</DOB>
+			</Contact>
+			<Contact>
+				<Name>Eduard Gereshovich</Name>
+				<Number>987878</Number>
+				<DOB>28-02-1970</DOB>
+			</Contact>
+			<Contact>
+				<Name>joel Sutton</Name>
+				<Number>732782</Number>
+				<DOB>27-01-1979</DOB>
+			</Contact>
+			<Contact>
+				<Name>Ram Krishna</Name>
+				<Number>7191999</Number>
+				<DOB>28-05-1983</DOB>
+			</Contact>
+			<Contact>
+				<Name>Ram Krishna</Name>
+				<Number>5191999</Number>
+				<DOB>22-4-1950</DOB>
+			</Contact>
+			<Contact>
+				<Name>alexander Pope</Name>
+				<Number>4191999</Number>
+				<DOB>02-09-1960</DOB>
+			</Contact>
+			<Contact>
+				<Name>Betty Pope</Name>
+				<Number>3191999</Number>
+				<DOB>5-11-1978</DOB>
+			</Contact>
+			<Contact>
+				<Name>cathy Pope</Name>
+				<Number>6191999</Number>
+				<DOB>02-02-1981</DOB>
+			</Contact>
+		</Contact-Info>
+	</input>
+	<output name="result" type="document"/>
+
+	<sort inputvariable="mydocument" sortexpr="/Contact-Info/Contact"
+		sortkeys="upper-case(Name/string())" sortdir="ascending"
+		outputvariable="result" />
+
+	<display message=" name-order result= " variable="result" />
+
+	<sort inputvariable="mydocument" sortexpr="/Contact-Info/Contact"
+		sortkeys="xs:decimal(Number/string()) descending" sortdir="ascending"
+		outputvariable="result" />
+
+	<display message=" Number-order result= " variable="result" />
+
+	<sort inputvariable="mydocument" sortexpr="/Contact-Info/Contact"
+		sortkeys="concat(                                                                                                           
+			substring(DOB/text(), (string-length(DOB/text()) - 3),  string-length(DOB/text())), 
+			substring-before(substring-after(DOB/text(), '/'), '/'),
+			substring-before(DOB/text(), '/')
+	      )"
+		sortdir="ascending" outputvariable="result" />
+
+	<display message=" Date-order result= " variable="result" />
+
+</mashup>
+

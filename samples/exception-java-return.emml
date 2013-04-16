@@ -1,0 +1,86 @@
+<!-- This work is licensed under a Creative Commons Attribution-Share Alike 3.0 United States License. 
+	 See http://creativecommons.org/licenses/by-sa/3.0/us for the full text. -->
+
+
+<mashup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.openmashup.org/schemas/v1.0/EMML/../schemas/EMMLSpec.xsd"
+        xmlns="http://www.openmashup.org/schemas/v1.0/EMML"
+ name="JavaExceptionHandlingSample2">
+        <emml-meta name="author">Raj Krishnamurthy(raj@jackbe.com)</emml-meta>
+
+        <output name="result" type="document"/>
+
+        <try>
+			
+            <datasource name="mydb" url="jdbc:hsqldb:hsql://localhost:9001" username="sa" password="" />
+
+            <sql name="mydb" query="select * from titles" outputvariable="result" />
+			
+			<!-- catch Java exception types -->
+	        <catch type="java.sql.SQLException">
+				<!-- if no variable specified for catch exception type, $exception is implicit variable name --> 	
+	            <display message="Catch SQL exception : " expr="$exception" /> 
+
+				<!--  exception translation  -->	
+				<constructor outputvariable="result">
+					<error>Mashup custom error message : {$exception}</error>
+				</constructor>
+				
+				<!-- return terminates mashup processing and returns with output variable value as Mashup Response -->  
+				<return/>
+	        </catch>
+        </try>
+
+
+
+
+
+        <try>
+			
+            <datasource name="SnapshotDataSource" url="jdbc:hsqldb:hsql://localhost:9001" username="sa" password="" />
+
+            <sql name="SnapshotDataSource" query="select * from titles" outputvariable="result" />
+			
+			<directinvoke endpoint="http://localhost:8020/service1" outputvariable="result"/>
+			
+	        <catch type="java.lang.ClassNotFoundException">
+	            <display message="caught class not found exception. " expr="$faultexception" /> 
+	        </catch>
+			<!-- catch Java exception types -->
+	        <catch type="java.sql.SQLException">
+	            <display message="Catch SQL exception : " expr="$exception" /> 
+				<!--  exception translation  -->	
+				<constructor outputvariable="result">
+					<error>Mashup custom error message : {$exception}</error>
+				</constructor>
+				<!-- <return/> -->
+	        </catch>
+	        <catch type="java.net.ConnectException e">
+	            <display message="java connect Exception : " expr="$e" />
+	        </catch>
+	        <catch type="org.oma.emml.me.commons.EMMLException">
+	            <display message="EMML exception : " expr="$result" />`
+	        </catch>
+	        <catch type="java.lang.RuntimeException">
+	            <display message="java.lang.RuntimeException : " expr="$faultexception" /> 
+	        </catch>
+        </try>
+		
+
+        <try>
+	        <xslt script="a.xsl" inputvariable="result" outputvariable="result" />			
+	        <catch type="emmlexception">
+	            <display message="emmlexception = " expr="$exception" /> 				
+	        </catch>
+        </try>
+
+        <try>
+	        <xslt script="a.xsl" inputvariable="result" outputvariable="result" />			
+	        <catch type="emmlexception">
+	            <display message="emmlexception = " expr="$exception" /> 
+				<!-- rethrow exception -->
+				<throw/>
+	        </catch>
+        </try>
+
+</mashup>

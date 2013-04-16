@@ -1,0 +1,59 @@
+<!-- This work is licensed under a Creative Commons Attribution-Share Alike 3.0 United States License. 
+	 See http://creativecommons.org/licenses/by-sa/3.0/us for the full text. -->
+
+
+<mashup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.openmashup.org/schemas/v1.0/EMML/../schemas/EMMLSpec.xsd"
+        xmlns="http://www.openmashup.org/schemas/v1.0/EMML"
+	    name="WhileSample">
+    <emml-meta name="author">Raj Krishnamurthy(raj@jackbe.com)</emml-meta>
+
+    <input name="flag" type="string" default="true"/>	    
+	<output name="result" type="document"/>
+
+    <variables>
+        <variable name="total" type="number" default="0"/>
+        <variable name="cnt" type="number" default="0"/>
+    </variables>
+
+
+    <!-- Loop until total exceeds 101 -->
+    <while condition="$total &lt; 101">
+
+        <display message="while-loop.1 : total = " expr="$total"/>
+        <assign fromexpr="$total + 10" outputvariable="total"/>
+
+    </while>
+
+
+    <assign fromexpr="0" outputvariable="total"/>
+    <while condition="$flag = 'true'">
+        
+        <assign fromexpr="$total + 10" outputvariable="total"/>
+        <display message="while-loop.2 : total = " expr="$total"/>
+        <if condition="$total > 100">
+            <assign literal="false" outputvariable="flag"/>            
+        </if>
+
+    </while>
+
+    <!-- Unconditional Loop - break using if condition  -->
+    <while condition="true()">
+        <display message="while-loop.3" expr="$cnt"/>
+        <assign fromexpr="$cnt + 1" outputvariable="cnt"/>
+
+        <if condition="$cnt > 10">
+            <display message="breaking out....." />
+            <break/>
+        </if>
+
+    </while>
+
+	<constructor outputvariable="result">
+		<result>
+			<total>{$total}</total>
+			<count>{$cnt}</count>
+		</result>
+	</constructor>
+
+</mashup>

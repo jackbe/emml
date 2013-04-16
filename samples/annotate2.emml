@@ -1,0 +1,52 @@
+<!-- This work is licensed under a Creative Commons Attribution-Share Alike 3.0 United States License. 
+	 See http://creativecommons.org/licenses/by-sa/3.0/us for the full text. -->
+
+
+<mashup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.openmashup.org/schemas/v1.0/EMML/../schemas/EMMLSpec.xsd"
+        xmlns="http://www.openmashup.org/schemas/v1.0/EMML"
+    name="Annotation">
+
+        <emml-meta name="author">Raj Krishnamurthy(raj@jackbe.com)</emml-meta>
+ 		<output name="result" type="document"/>
+
+       <constructor outputvariable="result">
+           <Products />
+       </constructor>
+
+       <constructor outputvariable="payload1">
+           <Items>
+               <Item xmlns="a1"/>
+               <Item xmlns="a2"/>
+               <Item xmlns="a3"/>
+           </Items>
+       </constructor>
+
+       <!-- annotating using existing items from other documents -->
+       <annotate variable="result" expr="/Products" >
+           element {node-name($payload1//*:Item[1])} { "Value1 " }
+       </annotate>
+
+       <annotate variable="result" expr="/Products" >
+           element {node-name($payload1//*:Item[2])} { "Value2 " }
+       </annotate>
+
+       <!-- annotating with new Items : literal uri  -->
+       <annotate variable="result" expr="/Products" >
+           element {QName('testuri1','NewItem')} { "Value3 " }
+       </annotate>
+
+       <!-- annotating with new Items : variable uri  -->
+       <variable name="uri1" type="string" default="testuri2"/>
+       <annotate variable="result" expr="/Products" >
+           element {QName($uri1,'NewNewItem')} { "Value3 " }
+       </annotate>
+
+
+       <annotate variable="result" expr="/Products" >
+           element {node-name($payload1//*:Item[1])} { "Zing! " }
+       </annotate>
+
+
+
+</mashup>

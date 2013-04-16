@@ -1,0 +1,28 @@
+<!-- This work is licensed under a Creative Commons Attribution-Share Alike 3.0 United States License. 
+	 See http://creativecommons.org/licenses/by-sa/3.0/us for the full text. -->
+
+
+<mashup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.openmashup.org/schemas/v1.0/EMML/../schemas/EMMLSpec.xsd"
+        xmlns="http://www.openmashup.org/schemas/v1.0/EMML"
+ name="XMLRPCRubySample">
+
+     <output name="result" type="document"/>
+    <emml-meta name="author">Raj Krishnamurthy(raj@jackbe.com)</emml-meta>
+     
+
+	 <variables>
+	 	<variable name="stringResult" type="string"/>
+	 </variables>
+     <script type="ruby" src="xmlrpc-sample.rb" outputvariable="stringResult"/>
+
+	<display message="current time is " variable="stringResult"/>
+
+	 <constructor outputvariable="result">
+	 	<currentTime>{$stringResult}</currentTime>
+	 </constructor>
+
+
+</mashup>
+
+

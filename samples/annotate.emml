@@ -1,0 +1,51 @@
+<!-- This work is licensed under a Creative Commons Attribution-Share Alike 3.0 United States License. 
+	 See http://creativecommons.org/licenses/by-sa/3.0/us for the full text. -->
+
+
+<mashup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.openmashup.org/schemas/v1.0/EMML/../schemas/EMMLSpec.xsd"
+        xmlns="http://www.openmashup.org/schemas/v1.0/EMML"
+    name="Annotation">
+
+        <emml-meta name="author">Raj Krishnamurthy(raj@jackbe.com)</emml-meta>
+        <output name="payload" type="document">
+                <books><book><name>Prey</name><price>7.99</price></book></books>
+        </output>
+
+    <variables>
+        <variable name="author" type="string" default="Crichton"/>
+        <variable name="field1" type="string" default="KeyPhrases"/>
+        <variable name="field1data" type="string" default="gamma assemblers, runaway swarm, molecular manufacturing"/>
+        <variable name="dynexpr" type="string" default="/books"/>
+    </variables>
+
+    <!-- Attribute Annotation - static attribute name & value -->
+    <annotate variable="payload" expr="/books/book" >
+           attribute bookstore { "amazon" }
+    </annotate>
+
+
+    <!-- Attribute Annotation - static attribute name & dynamic value -->
+    <annotate variable="payload" expr="/books/book" >
+           attribute author { $author }
+    </annotate>
+
+    <!-- Attribute Annotation - dynamic attribute name & dynamic value
+     expr can have any valid xpath expression.
+     -->
+    <annotate variable="payload" expr="/books/book[1]" >
+           attribute {$field1}  {$field1data}
+    </annotate>
+
+    <!-- Element Annotation -->
+    <annotate variable="payload" expr="/books/book" >
+        element review { "Thumbs Up! " }
+    </annotate>
+
+    <!-- Element Annotation Using Dynamic Expression -->
+    <annotate variable="payload" expr="$dynexpr" >
+        attribute title { "My Fav books " }
+    </annotate>
+
+
+</mashup>

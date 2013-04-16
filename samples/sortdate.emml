@@ -1,0 +1,57 @@
+<!-- This work is licensed under a Creative Commons Attribution-Share Alike 3.0 United States License. 
+	 See http://creativecommons.org/licenses/by-sa/3.0/us for the full text. -->
+
+
+<mashup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.openmashup.org/schemas/v1.0/EMML/../schemas/EMMLSpec.xsd"
+        xmlns="http://www.openmashup.org/schemas/v1.0/EMML"
+		xmlns:fn="java:org.oma.emml.utils.EMMLFunctions"
+	    name="SortDates">
+
+    <emml-meta name="author">Raj Krishnamurthy(raj@jackbe.com)</emml-meta>
+	<input name="mydocument" type="document">
+	
+		<Contact-Info>
+			<Contact id="1">
+				<Name>Robert Langdon</Name>
+				<Number>9191999</Number>
+				<DOB>28-01-1980</DOB>
+				<dt uts="1220788948">07 Sep 2008, 12:02</dt>
+			</Contact>
+			<Contact id="2">
+				<Name>Eduard Gereshovich</Name>
+				<Number>987878</Number>
+				<DOB>28-02-1970</DOB>
+				<dt uts="1220788948">17 Sep 2008, 12:02</dt>
+			</Contact>
+			<Contact id="3">
+				<Name>Goel Sutton</Name>
+				<Number>732782</Number>
+				<DOB>27-01-1979</DOB>
+				<dt uts="1220788948">20 Sep 2008, 12:02</dt>
+			</Contact>
+			<Contact id="8">
+				<Name>Ram Krishna</Name>
+				<Number>7191999</Number>
+				<DOB>28-05-1983</DOB>
+				<dt uts="1220788948">06 Sep 2008, 12:02</dt>
+			</Contact>
+			<Contact id="9">
+				<Name>Ram Krishna</Name>
+				<Number>5191999</Number>
+				<DOB>22-4-1950</DOB>
+				<dt uts="1220788948">10 Sep 2008, 12:02</dt>
+			</Contact>
+		</Contact-Info>
+	</input>
+	<output name="result" type="document"/>
+	<variable name="fmt1" type="string" default="dd MMM yyyy, HH:mm"/>
+	<variable name="fmt2" type="string" default="yyyy-MM-dd'T'hh:mm:ss"/>
+
+
+	<sort inputvariable="mydocument" sortexpr="/Contact-Info/Contact"
+		sortkeys="xs:dateTime(fn:ISODateFormatExt(dt,$fmt1 , $fmt2)) descending" 
+		outputvariable="result" />
+
+</mashup>
+

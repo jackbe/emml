@@ -1,0 +1,37 @@
+<!-- This work is licensed under a Creative Commons Attribution-Share Alike 3.0 United States License. 
+	 See http://creativecommons.org/licenses/by-sa/3.0/us for the full text. -->
+
+
+<mashup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.openmashup.org/schemas/v1.0/EMML/../schemas/EMMLSpec.xsd"
+        xmlns="http://www.openmashup.org/schemas/v1.0/EMML"
+		 name="ReutersDynamicNewsFeed">
+
+        <emml-meta name="author">Raj Krishnamurthy(raj@jackbe.com)</emml-meta>
+    
+        <input name="filterData" type="string" default="Finance"/>
+        <input name="filterCriteria" type="string" default="description"/>
+        <output name="resultFeed" type="document"/>
+
+        <!-- EMML Dynamic expressions provides powerful capability to do dynamic filters, joins, groupBy, etc.
+             EMML expressions can be dynamically created using {$dynamicvariable}  syntax.
+             -->
+
+        <!-- Invoke RSS Feed -->
+        <directinvoke endpoint="http://feeds.reuters.com/reuters/businessNews" outputvariable="newsFeed"/>
+
+        <!-- filter RSS feed for item description that matches the given input param
+            matches is xpath regular epxression function. 
+        -->
+        <filter inputvariable="newsFeed"
+                filterexpr="/rss/channel/item[matches({$filterCriteria}, $filterData, 'i')]" 
+                outputvariable="resultFeed"/>
+
+
+        <!--
+            depending on the input filterCriteria value, filterexpr would dynamically expand to
+                                    /rss/channel/item[matches(description, $filterData)] OR
+                                    /rss/channel/item[matches(title, $filterData)]             
+        -->
+
+</mashup>

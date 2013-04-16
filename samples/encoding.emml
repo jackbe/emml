@@ -1,0 +1,21 @@
+<!-- This work is licensed under a Creative Commons Attribution-Share Alike 3.0 United States License. 
+	 See http://creativecommons.org/licenses/by-sa/3.0/us for the full text. -->
+
+
+<mashup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.openmashup.org/schemas/v1.0/EMML/../schemas/EMMLSpec.xsd"
+        xmlns="http://www.openmashup.org/schemas/v1.0/EMML"
+     name="i14nFeeds">
+    <emml-meta name="author">Raj Krishnamurthy(raj@jackbe.com)</emml-meta>
+
+		<!-- serialize result with ISO-8859-1 encoding -->
+        <output name="result" type="document" output-encoding="ISO-8859-1"/>
+
+		<!-- Invoke a feed with ISO-8859-1 encoding -->
+        <directinvoke endpoint="http://www.eluniversal.com.mx/rss/notashome.xml" outputvariable="result"/>
+
+        <filter inputvariable="result"
+                filterexpr = "/rss/channel/item[position() = 1 to 5]"
+                outputvariable="result"/>
+
+</mashup>

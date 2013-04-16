@@ -1,0 +1,77 @@
+<!-- This work is licensed under a Creative Commons Attribution-Share Alike 3.0 United States License. 
+	 See http://creativecommons.org/licenses/by-sa/3.0/us for the full text. -->
+
+
+<mashup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:schemaLocation="http://www.openmashup.org/schemas/v1.0/EMML/../schemas/EMMLSpec.xsd"
+ xmlns="http://www.openmashup.org/schemas/v1.0/EMML"
+ name="DatabaseSample">
+        <emml-meta name="author">Raj Krishnamurthy(raj@jackbe.com)</emml-meta>
+ 
+        <input name="query1" type="string" default="foo"/>
+        <output name="result" type="document"/>
+        
+
+        <!-- Embedded SQL support in EMML gives ability to execute SQL statements -->
+
+        <!-- Connect to a SQL datasource -->
+        <datasource url="jdbc:hsqldb:hsql://host:port" username="user" password="password" />
+
+        <!-- execute select statement having a named parameter as emml variable i.e., ':query1'. Result is
+                converted into XML document --> 
+        <sql query="select column, column from table where column = :query1" outputvariable="result"/>
+
+		<!-- 'record' is root element for each database record -->
+        <display message="result records = " expr="$result//record"/>
+
+        <variable name="dt" type="datetime"/>
+
+        <!-- sample SQL call to stored procedure -->
+        <sql query="call curtime()" outputvariable="dt"/>
+
+        <display message="current dt = " expr="$dt"/>
+
+        <variable name="cnt" type="string"/>
+        <!-- sample SQL call to stored procedure that takes a named parameter -->
+        <sql query="call dayname(:dt)" outputvariable="cnt"/>
+
+        <display message="current dayname = " expr="$cnt"/>
+
+        <sql query="select count(*) from table " outputvariable="cnt"/>
+
+        <display message="count = " expr="$cnt"/>
+
+        <sql query="select max(id) from table " outputvariable="cnt"/>
+
+        <display message="count = " expr="$cnt"/>
+
+        <variables>
+            <variable name="start" type="number" default="1"/>
+            <variable name="countOfRows" type="number" default="7"/>
+            <variable name="unknwn" type="string" default="unknown"/>
+        </variables>
+
+        <!-- startrow specifies the starting position in cursor to be returned.  rowcount specifies
+                the # of records to be returned -->
+        <sql query="select column from table order by column desc"
+                startrow="$start" rowcount="$countOfRows" outputvariable="result"/>
+
+        <display message="result = " expr="data($result//colA)"/>
+
+
+		<variables>
+			<variable name="dsname" type="string" default="mydb"/>
+		</variables>
+
+        <datasource name="$dsname" url="jdbc:hsqldb:hsql://host:port" username="user" password="password" />
+        <sql name="$dsname" query="select column from table order by column desc"
+            startrow="1" rowcount="3" outputvariable="result"/>
+
+        <display message="result = " expr="data($result//record)"/>
+		<sqlBeginTransaction name="$dsname"/>
+		<sqlUpdate statement="update table set column = :unknwn where service_id = :unknwn " name="$dsname" />
+		<sqlCommit name="$dsname"/>
+
+</mashup>
+
+

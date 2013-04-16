@@ -1,0 +1,64 @@
+<!-- This work is licensed under a Creative Commons Attribution-Share Alike 3.0 United States License. 
+	 See http://creativecommons.org/licenses/by-sa/3.0/us for the full text. -->
+
+
+<mashup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xsi:schemaLocation="http://www.openmashup.org/schemas/v1.0/EMML/../schemas/EMMLSpec.xsd"
+        xmlns="http://www.openmashup.org/schemas/v1.0/EMML"
+ name="JsonPostPayloadSample">
+        <emml-meta name="author">Raj Krishnamurthy(raj@jackbe.com)</emml-meta>
+    
+        <!--    JSON payload in HTTP POST : 
+                    specified using subtype='json' for 'postBody' input variable -->
+        <input name="postBody" type="document" subtype="json">
+        <!-- default sample value -->
+        <![CDATA[
+			  [
+			      {
+			         "precision": "zip",
+			         "Latitude":  37.7668,
+			         "Longitude": -122.3959,
+			         "Address":   "",
+			         "City":      "SAN FRANCISCO",
+			         "State":     "CA",
+			         "Zip":       "94107",
+			         "Country":   "US"
+			      },
+			      {
+			         "precision": "zip",
+			         "Latitude":  37.371991,
+			         "Longitude": -122.026020,
+			         "Address":   "",
+			         "City":      "SUNNYVALE",
+			         "State":     "CA",
+			         "Zip":       "94085",
+			         "Country":   "US"
+			      }
+			   ]
+        ]]>
+        </input>
+        <!-- Mashup output is JSON document -->
+        <output name="resultDoc" type="document" subtype="json"/>
+
+        
+        <!-- Input JSON document may be  used subsequently in directinvoke or javascript -->
+
+        <!-- send JSON document as-is to another service in POST body 
+        <directinvoke endpoint="http://domain/jsonService"
+                requestbody="$postBody"
+                outputvariable="jsonResponse" />
+        -->
+
+        <!-- Process input JSON document using javascript -->
+        <script type="text/javascript" inputvariables="postBody" outputvariable="resultDoc">
+        <![CDATA[
+            var jsonObj = JSON.parse(postBody);
+
+			print(jsonObj);
+
+			resultDoc = JSON.stringify(jsonObj);
+        ]]>
+        </script>
+
+</mashup>

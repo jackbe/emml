@@ -1,0 +1,122 @@
+<!-- This work is licensed under a Creative Commons Attribution-Share Alike 3.0 United States License. 
+	 See http://creativecommons.org/licenses/by-sa/3.0/us for the full text. -->
+
+
+<mashup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.openmashup.org/schemas/v1.0/EMML/../schemas/EMMLSpec.xsd"
+        xmlns="http://www.openmashup.org/schemas/v1.0/EMML"
+ name="CompanyInfoJoinSample2">
+
+        <emml-meta name="author">Raj Krishnamurthy(raj@jackbe.com)</emml-meta>
+
+         <!-- Initializing parameters with default static data - Company Profilers & Company Stock Info. -->
+        <input name="xigniteProfiles" type="document">
+            <profiles>
+                <profile>
+                  <ticker>aapl</ticker>
+                  <companyname>Apple Inc.</companyname>
+                  <address>1 Infinite LoopCupertino, CA95014United States</address>
+                  <phone> Phone: 408-996-1010 Fax: 408-996-0275 </phone>
+                  <url>http://www.apple.com</url>
+                  <summary>Apple Inc. designs, manufactures, and sells personal computers, portable digital music players, and mobile communication devices, as well as related software, services, peripherals, and networking solutions worldwide. The company's products include desktop and notebook computers, server and storage products, and related devices and peripherals; Mac OS X operating system; and iLife, a suite of software for creation and management of digital photography, music, movies, DVDs, and Web site. In addition, it provides music products and services comprising iPod, portable digital music players and related accessories; online music services, third-party music, audio books, music videos, short films, television shows, movies, podcasts, and iPod games through its iTunes stores; and portable and desktop speaker systems, headphones, car radio solutions, voice recorders, cables and docks, power supplies and chargers, and carrying cases and armbands. Further, the company sells peripheral products, including printers, storage devices, computer memory, digital video, and still cameras, as well as various other computing products and supplies. Additionally, Apple Inc. offers various software products and computer technologies comprising Mac OS X operating system software; server software and related solutions; professional application software; and consumer, education, and business oriented application software. The company also provides Internet software and services comprising Safari, a web browser; QuickTime, a multimedia software; Mac, a suite of Internet services. In addition, it offers wireless connectivity and networking services. As of September 30, 2007, the company had 197 retail stores in the United States, Canada, Japan, the United Kingdom, and Italy. Apple Inc. was founded in 1976. It was formerly known as Apple Computer, Inc. and changed its name to Apple Inc. in January 2007. The company is headquartered in Cupertino, California.</summary>
+                  <source>Yahoo! Finance</source>
+                </profile>
+                <profile>
+                  <ticker>goog</ticker>
+                  <companyname>Google Inc.</companyname>
+                  <address>1600 Amphitheatre ParkwayMountain View, CA94043United States</address>
+                  <phone> Phone: 650-253-0000 Fax: 650-253-0001 </phone>
+                  <url>http://www.google.com</url>
+                  <summary>Google, Inc., a technology company, maintains index of Web sites and other online content for users, advertisers, Google network members, and other content providers. Its automated search technology helps users to obtain instant access to relevant information from its online index. The company's solutions provide targeted advertising and Internet search solutions, as well as intranet solutions via an enterprise search appliance. Its products and services for users include Google.com for search and personalization, which provides Google Web Search, Google Image Search, Google Book Search, Google Scholar, Google Base, Google Webmaster Tools, Google Finance, Google News, Personalized Homepage and Search, Google Co-op and Custom Search, Google Video, and YouTube. The company's products for users also comprise Google Docs, Google Calendar, Gmail, Google Groups, Google Reader, orkut, and Blogger. In addition, it offers various downloadable applications for users, which consist of Google Desktop, Google Pack, Google Toolbar, and Picasa; and Google GEO product line comprising Google Earth, Google Maps, and Google Sketchup and Sketchup Pro, as well as provides Google Checkout, a service for users, advertisers, and participating merchants. Further, the company provides Google Mobile, a product line for users to search and view the mobile Web, as well as the Google index; and Google Labs, a testbed for engineers and Google users. Additionally, it offers Google AdWords, an auction-based advertising program; and Google AdSense program for content owners, which enables Web sites that are part of the Google Network to deliver AdWords ads. Further, the company offers Google Enterprise product line, which includes Google Mini and Google Search Appliance products for small-and medium-sized businesses; and Google Apps that provides hosted communication and collaboration tools for organizations. Google, Inc. was founded in 1998 and is headquartered in Mountain View, California.</summary>
+                  <source>Yahoo! Finance</source>
+                </profile>
+                <profile>
+                  <ticker>java</ticker>
+                  <companyname>Sun Microsystems Inc.</companyname>
+                  <address>4150 Network CircleSanta Clara, CA95054United States</address>
+                  <phone> Phone: 650-960-1300 Fax: 650-336-0646 </phone>
+                  <url>http://www.sun.com</url>
+                  <summary>Sun Microsystems, Inc. develops products and services for the network economy. It provides network computing infrastructure product and service solutions worldwide under brands, including Java technology platform, Solaris operating system, Sun StorageTek storage solutions, and the UltraSPARC processor. The company also provides solutions for various business and technical activities, such as software development, mechanical design, financial analysis, graphics, visualization, simulation, and education, as well as develops and sells silicon-based chips that facilitate networking, cryptography, and high-performance computing. In addition, it offers enterprise infrastructure software systems, software desktop systems, developer software, and infrastructure management software; data storage products and services, including tape storage products, such as libraries, drives, virtualization systems, media, and software; and disk system product line consisting of data center disks, network attached storage, enterprise archive system, midrange disks, workgroups disks, a boot disk, and disk device software. Further, Sun Microsystems offers support and managed services for hardware, software, and client solutions, as well as provides professional and educational services. It also offers component products, such as central processor unit chips and embedded boards on an original equipment manufacturer basis; and supplies after-market and peripheral products. The company's solutions are used in technical/scientific, business, engineering, telecommunications, financial services, manufacturing, retail, government, life sciences, media and entertainment, transportation, energy/utilities, and healthcare industries. It has strategic alliances with AMD, Fujitsu, and Hitachi Data Systems; and a collaboration with Perago Systems. The company was founded in 1982 and is based in Santa Clara, California.</summary>
+                  <source>Yahoo! Finance</source>
+                </profile>
+            </profiles>
+        </input>
+
+        <input name="yahooFinanceQuotes" type="document">
+            <GetQuotesResponse>
+                    <Quote>
+                        <Symbol>JAVA</Symbol>
+                        <Name>Sun Microsystems, Inc.</Name>
+                        <Open>15.12</Open>
+                        <High>15.51</High>
+                        <Low>15.11</Low>
+                        <Last>15.38</Last>
+                        <Volume>12573587</Volume>
+                        <Change>0.12</Change>
+                    </Quote>
+                    <Quote>
+                        <Symbol>GOOG</Symbol>
+                        <Name>Google Inc.</Name>
+                        <Open>469.41</Open>
+                        <High>472</High>
+                        <Low>457.54</Low>
+                        <Last>464.19</Last>
+                        <Volume>6048035</Volume>
+                        <Change>-3.62</Change>
+                    </Quote>
+                    <Quote>
+                        <Symbol>AAPL</Symbol>
+                        <Name>Apple Inc.</Name>
+                        <Open>153.35</Open>
+                        <High>153.89</High>
+                        <Low>150.46</Low>
+                        <Last>151.44</Last>
+                        <Volume>31211124</Volume>
+                        <Change>-1.4</Change>
+                    </Quote>
+            </GetQuotesResponse>
+        </input>
+
+        <output name="result" type="document"/>
+
+        <!-- Join multiple datasets using a equivalent data field (e.g. ticker & Symbol). Join conditions
+        may contain functions enabling case-insensitive joins; sub-string based joins, etc.
+        By default, ALL columns are selected for output. However, the output of join can be
+        customized by using a <select/> statement.
+        -->
+        <join outputvariable="result"
+              joincondition="$xigniteProfiles/profiles/profile/upper-case(ticker) =
+                            $yahooFinanceQuotes/GetQuotesResponse/Quote/upper-case(Symbol)">
+            <select name="CompanySummary">
+                        <Summary>
+                            {$yahooFinanceQuotes/Symbol}
+                            {$yahooFinanceQuotes/High}
+                            {$yahooFinanceQuotes/Low}
+                            {$xigniteProfiles/url}
+                        </Summary>
+            </select>
+        </join>
+        <!-- Sample Output
+            <CompanySummary>
+              <Summary>
+                <Symbol>AAPL</Symbol>
+                <High>153.89</High>
+                <Low>150.46</Low>
+                <url>http://www.apple.com</url>
+              </Summary>
+              <Summary>
+                <Symbol>GOOG</Symbol>
+                <High>472</High>
+                <Low>457.54</Low>
+                <url>http://www.google.com</url>
+              </Summary>
+              <Summary>
+                <Symbol>JAVA</Symbol>
+                <High>15.51</High>
+                <Low>15.11</Low>
+                <url>http://www.sun.com</url>
+              </Summary>
+            </CompanySummary>
+        -->
+
+</mashup>
