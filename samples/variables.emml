@@ -1,0 +1,51 @@
+
+
+<!-- This work is licensed under a Creative Commons Attribution-Share Alike 3.0 United States License. 
+	 See http://creativecommons.org/licenses/by-sa/3.0/us for the full text. -->
+
+
+<mashup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.openmashup.org/schemas/v1.0/EMML/../schemas/EMMLSpec.xsd"
+        xmlns="http://www.openmashup.org/schemas/v1.0/EMML"
+    name="VariableScopingRules">
+
+        <emml-meta name="author">Raj Krishnamurthy(raj@jackbe.com)</emml-meta>
+        <output name="result" type="document"/>
+
+    <variables>
+        <variable name="v1" type="string" default="Crichton"/> <!-- create explicit global variable -->
+    </variables>
+
+	<assign literal="Ken Scott" outputvariable="v2"/>	<!-- create implicit global variable -->
+
+	<display message="main-block: v1 = " expr="upper-case($v1)"/>
+	<display message="main-block: v2 = " expr="upper-case($v2)"/>
+
+	<sequence>
+        <variable name="v1" type="string" default="Steig Larsson"/> <!-- create explicit local variable, hides global v1 in this block -->
+		<display message="sequence-block: v1 = " expr="upper-case($v1)"/>
+
+		<assign literal="Kathryn Stockett" outputvariable="v2"/>	<!-- Assigns to implicitly created variable v2 in main block -->
+		<display message="sequence-block: v2 = " expr="upper-case($v2)"/>   
+
+		<assign literal="Ken Scott" outputvariable="v3"/>			<!-- Creates implicit variable v3 local to this block -->
+		<display message="sequence-block: v3 = " expr="upper-case($v3)"/>   
+
+        <variable name="v4" type="string" default="Ian M. Banks"/> <!-- create explicit local variable -->
+		<display message="sequence-block: v4 = " expr="upper-case($v4)"/>
+	</sequence>
+
+	
+	<display message="main-block: v1 = " expr="upper-case($v1)"/>
+	<display message="main-block: v2 = " expr="upper-case($v2)"/>
+	<!-- v3 & v4 variables are not visible in main block -->
+
+	<constructor outputvariable="result"> 
+	 <result> 
+	   	<v1>{upper-case($v1)}</v1>
+	   	<v2>{upper-case($v2)}</v2>
+	   </result> 
+	</constructor> 
+			
+
+</mashup>

@@ -1,0 +1,44 @@
+<!-- This work is licensed under a Creative Commons Attribution-Share Alike 3.0 United States License. 
+	 See http://creativecommons.org/licenses/by-sa/3.0/us for the full text. -->
+
+
+<mashup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.openmashup.org/schemas/v1.0/EMML/../schemas/EMMLSpec.xsd"
+        xmlns="http://www.openmashup.org/schemas/v1.0/EMML"
+ name="GroupByService2">
+    <emml-meta name="author">Raj Krishnamurthy(raj@jackbe.com)</emml-meta>
+
+        <output name="groupedResult" type="document">
+              <authors/>
+        </output>
+
+        <!-- Data aggregation using Procedural logic with <foreach/>, <appendresult/> -->
+            <variables>
+                <variable name="feed" type="document">
+                        <rss>
+                            <channel>
+                                <item><author name="Pike"/></item>
+                                <item><author name="Kernigham"/></item>
+                                <item><author name="Gosling"/></item>
+                                <item><author name="Pike"/></item>
+                                <item><author name="Kernigham"/></item>
+                                <item><author name="Stroustrup"/></item>
+                            </channel>
+                        </rss>
+                </variable>
+            </variables>
+
+            <!-- Iterate using collection of distinct authors -->
+            <foreach variable="itm" items="distinct-values($feed//author/@name)">
+                <display message="author = " expr="$itm"/>
+                <display message="author count = " expr="count($feed//author[@name=$itm])"/>
+
+                <!-- Compute sum of authors for each distinct author name-->
+                <appendresult outputvariable="groupedResult">
+                      <author name="{$itm}" itemsCount="{count($feed//author[@name=$itm])}"/>
+                </appendresult>
+            </foreach>
+
+            <display message="groupedresults....." expr="$groupedResult"/>
+
+</mashup>

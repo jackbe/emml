@@ -1,0 +1,52 @@
+<!-- This work is licensed under a Creative Commons Attribution-Share Alike 3.0 United States License. 
+	 See http://creativecommons.org/licenses/by-sa/3.0/us for the full text. -->
+
+
+<mashup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.openmashup.org/schemas/v1.0/EMML/../schemas/EMMLSpec.xsd"
+        xmlns="http://www.openmashup.org/schemas/v1.0/EMML"
+        name="XsltSample">
+        <emml-meta name="author">Raj Krishnamurthy(raj@jackbe.com)</emml-meta>
+    
+         <input name="dataset1" type="document">
+             <data>
+                 <description>Sales evolution 2003</description>
+                 <entry >15.3</entry>
+                 <entry >45.3</entry>
+                 <entry >90</entry>
+                 <entry >120.5</entry>
+                 <entry >150.3</entry>
+                 <entry >155.6</entry>
+                 <entry >160.3</entry>
+                 <entry >120</entry>
+                 <entry >140.3</entry>
+                 <entry >120</entry>
+                 <entry >159.6</entry>
+                 <entry >210.6</entry>
+             </data>
+        </input>
+        <input name="stylesheet" type="string" default="sales.xsl"/>
+
+
+        <output name="result" type="document"/>
+
+        <variables>
+            <variable name="sty" type="string" default="sales"/>
+        </variables>
+        <xslt script="sales.xsl" inputvariable="dataset1" outputvariable="result" />
+
+        <display message="transformed result : " expr="$result"/>
+
+        <!-- Transformation using variable name for script -->
+        <xslt script="$stylesheet" inputvariable="dataset1" outputvariable="result" />
+
+        <display message="transformed result : " expr="$result"/>
+
+        <assign literal="sales" outputvariable="stylesheet"/>
+
+        <!-- Transformation using expression for script -->
+        <xslt script="{$stylesheet}.xsl" inputvariable="dataset1" outputvariable="result" />
+
+
+</mashup>
+

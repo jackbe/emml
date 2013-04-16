@@ -1,0 +1,33 @@
+<!-- This work is licensed under a Creative Commons Attribution-Share Alike 3.0 United States License. 
+	 See http://creativecommons.org/licenses/by-sa/3.0/us for the full text. -->
+
+
+<mashup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.openmashup.org/schemas/v1.0/EMML/../schemas/EMMLSpec.xsd"
+        xmlns="http://www.openmashup.org/schemas/v1.0/EMML"
+    name="SPARQLQuery">
+        <emml-meta name="author">Raj Krishnamurthy(raj@jackbe.com)</emml-meta>
+    
+        <output name="result" type="string"/>
+
+		<variable name="sparqlQuery" type="string"/>
+
+        <variable name="reqheader" type="document">
+                <headers>
+                    <Content-type>application/x-www-form-urlencoded</Content-type>
+                </headers>
+        </variable>
+
+		<script type="groovy" outputvariable="$sparqlQuery">
+		<![CDATA[
+			sparqlQuery = '''query=PREFIX foaf: <http://xmlns.com/foaf/0.1/> PREFIX swrc: <http://swrc.ontoware.org/ontology#> SELECT DISTINCT $person $affiliation WHERE { $person a foaf:Person.  $person swrc:affiliation $affiliation }'''
+		]]>
+		</script>
+
+        <directinvoke endpoint="http://data.semanticweb.org/sparql"
+                        outputvariable="result"
+                        method="post"
+						header="$reqheader"
+                        requestbody="$sparqlQuery" />
+
+</mashup>

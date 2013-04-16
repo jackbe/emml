@@ -1,0 +1,37 @@
+<!-- This work is licensed under a Creative Commons Attribution-Share Alike 3.0 United States License. 
+	 See http://creativecommons.org/licenses/by-sa/3.0/us for the full text. -->
+
+
+<mashup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.openmashup.org/schemas/v1.0/EMML/../schemas/EMMLSpec.xsd"
+        xmlns="http://www.openmashup.org/schemas/v1.0/EMML"
+ name="REST_SOAP_ExceptionHandling">
+        <emml-meta name="author">Raj Krishnamurthy(raj@jackbe.com)</emml-meta>
+
+        <output name="responseDoc" type="document"/>
+		<variable name="responseHeader" type="document"/>
+		<variable name="responseCode" type="string" />
+		
+		<display message="###### Handling SOAP Exceptions ######"	/>
+		
+        <try>
+			<display message="## Invoking SOAP endpoint (version 1.1) ##"	/>
+			<!-- SOAP Fault will generate SoapException -->
+            <directinvoke endpoint="http://ec2-23-22-63-57.compute-1.amazonaws.com/soapfault1.php" outputvariable="result1" />
+        	<catch type="soapexception se">
+            	<display message="caught soapException= " expr="$se//*:Fault"/>
+            	<display message="soapException Value = " expr="$se//*:Value/string()"/>
+        	</catch>
+        </try>
+
+        <try>
+			<display message="## Invoking SOAP endpoint ( version 1.2) ##"	/>
+			<!-- SOAP Fault will generate SoapException -->
+            <directinvoke endpoint="http://ec2-23-22-63-57.compute-1.amazonaws.com/soapfault2.php" outputvariable="result1" />
+	        <catch type="soapexception se">
+	            <display message="caught soapException v2 = " expr="$se//*:Fault"/>
+	            <display message="soapException Value = " expr="$se//*:Value/string()"/>
+	        </catch>
+        </try>
+
+</mashup>

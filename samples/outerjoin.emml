@@ -1,0 +1,114 @@
+<!-- This work is licensed under a Creative Commons Attribution-Share Alike 3.0 United States License. 
+	 See http://creativecommons.org/licenses/by-sa/3.0/us for the full text. -->
+
+
+<mashup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.openmashup.org/schemas/v1.0/EMML/../schemas/EMMLSpec.xsd"
+        xmlns="http://www.openmashup.org/schemas/v1.0/EMML"
+ name="LeftOuterJoinSample">
+        <emml-meta name="author">Raj Krishnamurthy(raj@jackbe.com)</emml-meta>
+
+  <output name="result" type="document"/>
+
+   <variables>
+    <variable name="parts" type="document">
+       <parts>
+        <part>
+            <partno>p1</partno>
+            <description>p1 desc</description>
+        </part>
+        <part>
+            <partno>p2</partno>
+            <description>p2 desc</description>
+        </part>
+        <part>
+            <partno>p3</partno>
+            <description>p3 desc</description>
+        </part>
+        <part>
+            <partno>p4</partno>
+            <description>p4 desc</description>
+        </part>
+        <part>
+            <partno>p5</partno>
+            <description>p5 desc</description>
+        </part>
+       </parts>
+    </variable>
+        
+  <variable name="suppliers" type="document">
+      <suppliers>
+        <supplier>
+            <suppno>s1</suppno>
+            <suppname>s1 desc</suppname>
+        </supplier>
+      <supplier>
+          <suppno>s2</suppno>
+          <suppname>s2 desc</suppname>
+      </supplier>
+      <supplier>
+          <suppno>s3</suppno>
+          <suppname>s3 desc</suppname>
+      </supplier>
+    </suppliers>  
+  </variable>
+
+  <variable name="catalog" type="document">
+   <items>
+      <item>
+          <partno>p1</partno>
+          <suppno>s1</suppno>
+          <price>10</price>
+      </item>
+      <item>
+          <partno>p2</partno>
+          <suppno>s1</suppno>
+          <price>10</price>
+      </item>
+      <item>
+          <partno>p3</partno>
+          <suppno>s1</suppno>
+          <price>10</price>
+      </item>
+      <item>
+          <partno>p2</partno>
+          <suppno>s2</suppno>
+          <price>11</price>
+      </item>
+    </items>  
+  </variable>
+       <variable name="s" type="document"/>
+
+        </variables>
+
+        <!--
+            The following query demonstrates a left outer join. It returns names of all the suppliers in alphabetic order,
+            including those that supply no parts.
+            In the result, each supplier element contains the descriptions of all the parts it supplies,
+            in alphabetic order.
+        -->
+        <constructor outputvariable="result">
+            <![CDATA[
+               <result>
+               {
+                for $s in $suppliers/suppliers/supplier
+                order by $s/suppname
+                return
+                   <supplier>
+                      {
+                        $s/suppname,
+                        for $i in $catalog/items/item
+                                 [suppno = $s/suppno],
+                            $p in $parts/parts/part
+                                 [partno = $i/partno]
+                        order by $p/description
+                        return $p/description
+                      }
+                   </supplier>
+               }    
+               </result>    
+             ]]>
+        </constructor>
+
+</mashup>
+

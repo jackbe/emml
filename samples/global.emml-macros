@@ -1,0 +1,190 @@
+<!-- This work is licensed under a Creative Commons Attribution-Share Alike 3.0 United States License. 
+	 See http://creativecommons.org/licenses/by-sa/3.0/us for the full text. -->
+
+
+<macros xmlns="http://www.openmashup.org/schemas/v1.0/EMML"
+        xmlns:myfunc="java:org.jackbe.emml.utils.EMMLFunctions">
+
+    <macro name="GeoAnnotater" xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#" 
+    xmlns:y="urn:yahoo:maps">
+
+            <input name="location" type="document" />
+
+            <output name="macroResult" type="document"/>
+            <presto-meta name="macrotype">system</presto-meta>
+            <presto-meta name="help">
+              <description>Adds geographic coordinates to Salesforce service results</description>
+              <parameters>
+                <parameter name="location">Input document with location fields (city, state and zip) to add geographic data to</parameter>
+              </parameters>
+            </presto-meta>
+
+            <variables>
+                <variable name="locationstr" type="string"/>
+            </variables>
+
+            <assign fromexpr="string-join((  $location//city, $location//state, $location//zip), ',')"
+                    outputvariable="$locationstr"/>  
+
+            <display message="locationstr = " expr="$locationstr"/>
+
+            <directinvoke  endpoint="http://local.yahooapis.com/MapsService/V1/geocode"
+                                appid=".kcC72DV34FYTpAGuwwbV8YGI.DsMBQ0RB9eZARS621ecnHq33c.g1XJV93a64hrdaM3"
+                                output="xml"
+                                location="$locationstr"
+                                outputvariable="$georesult"/>
+
+            <annotate variable="location" expr="." >
+                element geo:lat { $georesult//y:Latitude/string() },
+                element geo:long { $georesult//y:Longitude/string() }
+            </annotate>
+
+        
+            <assign outputvariable="$macroResult" fromvariable="$location"/>
+
+    </macro>
+
+
+    <!--
+    Sample Usage:   <macro:FormatAsCSV xmlDoc="$feed1"  outputvariable="csv"/>
+
+    -->
+    <macro name="FormatAsCSV">
+        <input name="xmldoc" type="document"/>
+        <output name="csvdoc" type="string"/>
+
+		<display message="formatascsv called  "  />
+
+        <presto-meta name="macrotype">user</presto-meta>
+        <presto-meta name="help">
+          <description>Formats the input document as comma-separated-values (CSV)</description>
+          <parameters>
+            <parameter name="xmldoc">Input document to convert to CSV format</parameter>
+          </parameters>
+        </presto-meta>
+
+        <variable name="dynamicExpr" type="string"/>
+        <variable name="headerExpr" type="string"/>
+        <variable name="resultStr" type="string"/>
+        <variable name="header" type="boolean" default="true"/>
+        <variable name="collectionroot" type="string"/>
+
+        <presto-meta name="parameterType">
+            <parameters>
+                <parameter name="collectionroot">
+                    <type>xpath</type>
+                    <reference>xmldoc</reference>
+                </parameter>
+            </parameters>
+        </presto-meta>
+        
+        <namespaces>
+            <namespace prefix="presto"  uri="java:org.oma.emml.utils.EMMLFunctions"/>
+        </namespaces>
+
+		<display message="xmldoc = " expr="$xmldoc"/>
+        <assign outputvariable="collectionroot" fromexpr="presto:infergroupXPath($xmldoc)"/>
+		<display message="collectionroot" expr="$collectionroot"/>
+
+        <if condition="$collectionroot != '' ">
+            <if condition="$header = true()">
+
+                <template expr="string-join($xmldoc{$collectionroot}[1]/*/name(.), ', ')" outputvariable="$headerExpr"/>
+
+                <assign fromexpr="{$headerExpr}" outputvariable="$csvdoc"/>
+
+                <script type="text/javascript">
+                    <![CDATA[
+                        csvdoc = csvdoc + "\n";
+                    ]]>
+                </script>
+            </if>
+
+
+            <template expr="$xmldoc{$collectionroot}" outputvariable="$dynamicExpr"/>
+
+            <foreach variable="itm" items="{$dynamicExpr}">
+                <assign fromexpr="string-join($itm/*, ',')" outputvariable="$resultStr"/>
+
+
+
+                <assign fromexpr="concat($csvdoc, $resultStr)" outputvariable="$csvdoc"/>
+
+                <script type="text/javascript">
+                    <![CDATA[
+                        csvdoc = csvdoc + "\n";
+                    ]]>
+                </script>
+
+            </foreach>
+        <else>     
+            <assign literal="Unable to format in CSV - No data group found." outputvariable="csvdoc"/>
+        </else>
+        </if>
+
+    </macro>
+    
+    
+    <!--Sample usage <macro:XMLConstructorFromFile filename="jems-ext.xml"  outputvariable="output"/> -->
+    <macro name="XMLConstructorFromFile">
+       <input name="filename" type="string"/>
+       <output name="doc" type="document"/>
+       <presto-meta name="macrotype">system</presto-meta>
+       <presto-meta name="help">
+         <description>Opens an XML file located in the Mashup Server web-app</description>
+         <parameters>
+           <parameter name="filename">Name of the file to import</parameter>
+         </parameters>
+       </presto-meta>
+
+    <script type="text/javascript" >
+        <![CDATA[
+            var statemanager = Packages.org.oma.emml.utils.MashupStateManager.getInstance();
+
+            var macrosFile = statemanager.getFileResourceAsString(filename);
+
+            doc = Packages.org.oma.emml.utils.XMLConversionUtils.XMLToDOM(macrosFile)
+
+        ]]>
+       </script>
+    </macro>
+
+
+    <macro name="executeDynamicEMML">
+        <input name="script" type="string"/>
+        <output name="result" type="document"/>
+        <presto-meta name="macrotype">system</presto-meta>
+
+        <variables>
+            <variable name="resultStr" type="string"/>
+        </variables>
+
+        <script type="javascript">
+        <![CDATA[
+            var server =  new Packages.org.oma.emml.me.runtime.MashupDesigner()
+            resultStr = server.execute(script);
+            ]]>
+        </script>
+
+        <assign fromvariable="resultStr" outputvariable="result"/>
+        
+    </macro>
+
+
+    <macro name="computeBasicAuth">
+        <input name="user" type="string"/>
+        <input name="password" type="string"/>
+        <output name="basicauth" type="string"/>
+        <presto-meta name="macrotype">system</presto-meta>
+
+        <script type="text/javascript" >
+                <![CDATA[
+                var userPassword =  new Packages.java.lang.String(user + ":" + password);
+                basicauth = "Basic " +
+                            Packages.sun.misc.BASE64Encoder().encode (userPassword.getBytes());
+                ]]>
+        </script>
+
+    </macro>
+
+</macros>

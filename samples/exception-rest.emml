@@ -1,0 +1,70 @@
+<!-- This work is licensed under a Creative Commons Attribution-Share Alike 3.0 United States License. 
+	 See http://creativecommons.org/licenses/by-sa/3.0/us for the full text. -->
+
+
+<mashup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.openmashup.org/schemas/v1.0/EMML/../schemas/EMMLSpec.xsd"
+        xmlns="http://www.openmashup.org/schemas/v1.0/EMML"
+ name="RESTExceptionHandlingSample">
+        <emml-meta name="author">Raj Krishnamurthy(raj@jackbe.com)</emml-meta>
+
+        <output name="responseDoc" type="document"/>
+		<variable name="responseHeader" type="document"/>
+		<variable name="responseCode" type="string" />
+		
+		<display message="###### Handling REST Exceptions ######"	/>
+		<!-- HTTP Response code >= 300 will generate REST exception -->
+		
+		<!-- sample 1 -->
+        <try>
+            <directinvoke endpoint="http://localhost/unknown.php" outputvariable="result" />
+	        <catch type="restexception e">
+				<!-- exception variable 'e' contains http response. The response formats are implicitly
+				converted to XML from their original response formats (HTML, XML, JSON)   -->
+	            <display message="caught restException = " expr="$e" />
+	            <display message="extract 'p' element in response : = " expr="$e//*:p/string()" />
+				<!-- rethrow exception / invoke alternate service / return stub or cached response  -->
+	        </catch>
+        </try>
+
+		<!-- sample 2 -->
+        <try>			
+			<display message="## REST Exception 302 ##"	/>			
+            <directinvoke endpoint="http://localhost/foo302.php" 
+							outputvariable="result" 
+							followredirects="false"
+							responseheader="$responseHeader" 
+							responsecode="$responseCode"			/>
+
+	        <catch type="restexception e">
+	            <display message="caught restException = " expr="$e" />
+				<display message="responseCode = "	expr="$responseCode"/>			
+				<display message="responseHeader = "	expr="$responseHeader"/>			
+				<display message="Location = "	expr="$responseHeader//*:Location/string()"/>			
+				<!-- directinvoke to alternative endpoint in 'Location' response header -->  
+	        </catch>
+        </try>
+
+		<!-- sample 3 -->
+        <try>			
+			<display message="## REST Exception - using HTTP responsecode ##"	/>			
+            <directinvoke endpoint="http://localhost/foo302.php" outputvariable="result" 
+							followredirects="false" 
+							responseheader="$responseHeader" 
+							responsecode="$responseCode"/>
+
+	        <catch type="restexception e">
+				<!-- use if-conditional-blocks to fine-tune HTTP response handling --> 	
+				<if condition="$responseCode >= 500 ">
+	            	<display message="caught restException 5xxx " />
+				<elseif condition="$responseCode >= 400 ">
+	            	<display message="caught restException 4xxx " />					
+				</elseif>		
+				<elseif condition="$responseCode >= 300 ">
+	            	<display message="caught restException 3xxx " />					
+				</elseif>		
+				</if>
+	        </catch>
+        </try>
+
+</mashup>

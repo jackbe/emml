@@ -1,0 +1,57 @@
+<!-- This work is licensed under a Creative Commons Attribution-Share Alike 3.0 United States License. 
+	 See http://creativecommons.org/licenses/by-sa/3.0/us for the full text. -->
+
+
+<mashup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.openmashup.org/schemas/v1.0/EMML/../schemas/EMMLSpec.xsd"
+        xmlns="http://www.openmashup.org/schemas/v1.0/EMML"
+    name="GoogleAuthenticationService">
+
+        <emml-meta name="author">Raj Krishnamurthy(raj@jackbe.com)</emml-meta>
+    
+        <input name="service" type="string" default="cl"/>
+        <input name="email" type="string" default="jackbe.team@gmail.com" />
+        <input name="password" type="string" default="jackbejack" />
+		<output name="result" type="document"/>
+
+        <variables>
+            <variable name="reqheaders" type="document">
+                <![CDATA[
+                <headers>
+                    <Content-type>application/x-www-form-urlencoded</Content-type>
+                </headers>
+                ]]>
+            </variable>
+			<variable name="resultStr" type="string"/>
+        	<variable name="auth" type="string"/>
+        </variables>
+
+        <directinvoke endpoint="https://www.google.com/accounts/ClientLogin"
+                        method="post"
+                        accountType="GOOGLE"
+                        Email="$email"
+                        Passwd= "$password"
+                        service="$service"
+                        source="jackbe-jems"
+                        header="$reqheaders"
+                        outputvariable="resultStr"/>
+
+		<display message="resultStr = " variable="resultStr"/>
+
+        <script type="text/javascript" inputvariables="resultStr" outputvariable="auth" >
+            <![CDATA[
+            var r = new String(resultStr)
+			print("var r = " + r);
+            var ar = r.split("=");
+            auth = ar[ar.length-1];
+            auth = auth.slice(0, -1)
+			print("Google Auth Token : " + auth)
+            ]]>
+        </script>
+		<display message="auth = " variable="auth"/>
+
+		<constructor outputvariable="result">
+			<GoogleAuthToken>{$auth}</GoogleAuthToken>
+		</constructor>
+
+</mashup>    

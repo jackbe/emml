@@ -1,0 +1,88 @@
+<!-- This work is licensed under a Creative Commons Attribution-Share Alike 3.0 United States License. 
+	 See http://creativecommons.org/licenses/by-sa/3.0/us for the full text. -->
+
+
+<mashup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openmashup.org/schemas/v1.0/EMML/../schemas/EMMLSpec.xsd"
+	xmlns="http://www.openmashup.org/schemas/v1.0/EMML"
+	name="GroupbyService">
+
+        <emml-meta name="author">Satya Prakash(satya.prakash@jackbe.com)</emml-meta>
+	
+				<output name="groupedResult" type="document" />
+		<variables>
+			<variable name="employees" type="document">
+				<Employees>
+					<Employee>
+						<Name>Foo1</Name>
+						<Sex>M</Sex>
+						<State>CA</State>
+						<Age>20</Age>
+					</Employee>
+					<Employee>
+						<Name>Foo2</Name>
+						<Sex>F</Sex>
+						<State>CA</State>
+						<Age>35</Age>
+					</Employee>
+					<Employee>
+						<Name>Foo3</Name>
+						<Sex>F</Sex>
+						<State>CA</State>
+						<Age>30</Age>
+					</Employee>
+					<Employee>
+						<Name>Foo4</Name>
+						<Sex>F</Sex>
+						<State>CA</State>
+						<Age>30</Age>
+					</Employee>
+					<Employee>
+						<Name>Foo5</Name>
+						<Sex>M</Sex>
+						<State>CA</State>
+						<Age>40</Age>
+					</Employee>
+					<Employee>
+						<Name>Foo6</Name>
+						<Sex>M</Sex>
+						<State>MD</State>
+						<Age>20</Age>
+					</Employee>
+					<Employee>
+						<Name>Foo7</Name>
+						<Sex>M</Sex>
+						<State>MD</State>
+						<Age>20</Age>
+					</Employee>
+					<Employee>
+						<Name>Foo8</Name>
+						<Sex>M</Sex>
+						<State>MD</State>
+						<Age>20</Age>
+					</Employee>
+					<Employee>
+						<Name>Foo9</Name>
+						<Sex>F</Sex>
+						<State>MD</State>
+						<Age>40</Age>
+					</Employee>
+				</Employees>
+			</variable>
+		</variables>
+
+
+		<group outputvariable="groupedResult"
+			by="$employees//Employee/State">
+			<EmployeeByStateAndSex>
+				<EmployeeByState State="{$group_key}" count="{count(State)}">
+					<group by="Sex">
+						<EmployeeBySex Sex="{$group_key}" count="{count(Sex)}">
+							{$group_id1}
+						</EmployeeBySex>
+					</group>
+				</EmployeeByState>
+			</EmployeeByStateAndSex>
+		</group>
+
+</mashup>

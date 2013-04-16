@@ -1,0 +1,103 @@
+<!-- This work is licensed under a Creative Commons Attribution-Share Alike 3.0 United States License. 
+	 See http://creativecommons.org/licenses/by-sa/3.0/us for the full text. -->
+
+
+<mashup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.openmashup.org/schemas/v1.0/EMML/../schemas/EMMLSpec.xsd"
+        xmlns="http://www.openmashup.org/schemas/v1.0/EMML"
+ name="DynamicDataFiltering">
+
+        <emml-meta name="author">Raj Krishnamurthy(raj@jackbe.com)</emml-meta>
+    
+		<input name="name" type="string" default="foo1,foo2,foo3,foo4" />
+		<input name="createdby" type="string" default="user2" />
+		<input name="tag" type="string" />
+        <output name="result" type="document"/>
+
+		<variable name="serviceData" type="document">
+<services>
+  <service>
+    <name>foo1</name>
+    <createdby>user1</createdby>
+    <description>sample1</description>
+    <tag>tag1</tag>
+    <tag>tag2</tag>
+    <tag>tag3</tag>
+  </service>
+  <service>
+    <name>foo2</name>
+    <createdby>user2</createdby>
+    <description>sample2</description>
+    <tag>tag1</tag>
+    <tag>tag3</tag>
+  </service>
+  <service>
+    <name>foo3</name>
+    <createdby>user2</createdby>
+    <description>sample2</description>
+    <tag>tag1</tag>
+    <tag>tag3</tag>
+  </service>
+</services>
+		</variable>
+
+            <variable name="dynamicFilter" type="string"/>
+
+		<script type="groovy" inputvariables="$name, $createdby, $tag" outputvariable="$dynamicFilter">
+		<![CDATA[
+
+			def mkfilter = { values, key  ->
+				def value = []
+				value = values.split(',')
+
+				def sb = new StringBuffer()
+
+				sb << '('
+
+				def multi = false	
+				for ( String s in value) {
+					if ( multi ) 
+						sb << ' or '
+					sb << key + ' = ' + '\'' + s.trim() + '\'' 
+					multi = true;
+				}
+
+				sb << ')'
+			}
+
+			def namefilter = ''
+			def createdbyfilter = ''
+			def tagfilter = ''
+			
+			if (name.size() > 0 ) namefilter = mkfilter (name, 'name');
+
+			if ( createdby.size() > 0 ) createdbyfilter = mkfilter (createdby, 'createdby');
+
+			if ( tag.size() > 0 ) tagfilter = mkfilter (tag, 'tag');
+
+			def filter = new StringBuffer()
+
+			if ( namefilter.size() > 0 ) filter << namefilter 
+
+			if ( createdbyfilter.size() > 0 ) {
+				if ( filter.size() > 0 ) filter << ' and '
+				filter << createdbyfilter
+			}
+
+			if ( tagfilter.size() > 0 ) {
+				if ( filter.size() > 0 ) filter << ' and '
+				filter << tagfilter
+			}
+
+			dynamicFilter = filter.toString()
+		]]>
+		</script>
+
+
+		<display message="dynamicFilter = " expr="$dynamicFilter"/>
+
+        <filter inputvariable="serviceData"
+                filterexpr="/services/service[{$dynamicFilter}]"
+                outputvariable="result"/>
+
+</mashup>

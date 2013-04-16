@@ -1,0 +1,47 @@
+<!-- This work is licensed under a Creative Commons Attribution-Share Alike 3.0 United States License. 
+	 See http://creativecommons.org/licenses/by-sa/3.0/us for the full text. -->
+
+
+<mashup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.openmashup.org/schemas/v1.0/EMML/../schemas/EMMLSpec.xsd"
+        xmlns="http://www.openmashup.org/schemas/v1.0/EMML"
+    name="ErrorHandlingSample">
+        <emml-meta name="author">Raj Krishnamurthy(raj@jackbe.com)</emml-meta>
+
+        <input name="param1" type="string" default="Java"/>
+        <output name="result" type="document">
+            <result>
+                <title>Default Data</title>
+                <message>If function invocation fails, this default document would be returned</message>
+            </result>
+        </output>
+
+        <directinvoke endpoint="http://unknown.unknow:9999" outputvariable="result" onerror="continue" timeout="10"/>
+
+		<if condition="$faultcode = -2">
+			<constructor outputvariable="result">
+				<TimedErrorInfo>
+					<faultcode>{$faultcode}</faultcode>
+					<faultmessage>{$faultmessage}</faultmessage>
+				</TimedErrorInfo>
+			</constructor>
+		<elseif condition="$faultcode = -1">
+			<constructor outputvariable="result">
+				<ErrorInfo>
+					<faultcode>{$faultcode}</faultcode>
+					<faultmessage>{$faultmessage}</faultmessage>
+				</ErrorInfo>
+			</constructor>
+		</elseif>
+		<else>
+			<constructor outputvariable="result">
+				<Success>
+					<faultcode>{$faultcode}</faultcode>
+					<faultmessage>{$faultmessage}</faultmessage>
+				</Success>
+			</constructor>
+		</else>
+		</if>
+
+
+</mashup>

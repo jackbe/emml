@@ -1,0 +1,113 @@
+<!-- This work is licensed under a Creative Commons Attribution-Share Alike 3.0 United States License. 
+	 See http://creativecommons.org/licenses/by-sa/3.0/us for the full text. -->
+
+
+<mashup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.openmashup.org/schemas/v1.0/EMML/../schemas/EMMLSpec.xsd"
+        xmlns="http://www.openmashup.org/schemas/v1.0/EMML"
+	name="UnionSample">
+
+        <emml-meta name="author">Satya Prakash(satya.prakash@jackbe.com)</emml-meta>
+	
+        <output name="result-node-list" type="document"/>
+        
+		<variable name="dataset1" type="document">
+			<Quarter-1>
+				<Performances>
+					<Performance>
+						<Month>2000-01</Month>
+						<Rate>-1.4181184084271425</Rate>
+					</Performance>
+					<Performance>
+						<Month>2000-02</Month>
+						<Rate>-1.781426487925819</Rate>
+					</Performance>
+					<Performance>
+						<Month>2000-03</Month>
+						<Rate>10.046341326225377</Rate>
+					</Performance>
+					<Performance>
+						<Month>2000-04</Month>
+						<Rate>7.271983533482704</Rate>
+					</Performance>
+				</Performances>
+			</Quarter-1>
+		</variable>
+
+		<variable name="dataset2" type="document">
+			<Quarter-2>
+				<Performances>
+					<Performance>
+						<Month>2000-01</Month>
+						<Rate>0.6</Rate>
+					</Performance>
+					<Performance>
+						<Month>2000-02</Month>
+						<Rate>10</Rate>
+					</Performance>
+					<Performance>
+						<Month>2000-03</Month>
+						<Rate>4</Rate>
+					</Performance>
+					<Performance>
+						<Month>2000-04</Month>
+						<Rate>7</Rate>
+					</Performance>
+				</Performances>
+			</Quarter-2>
+		</variable>
+
+
+		<variable name="node-list1" type="document" />
+		<variable name="node-list2" type="document" />
+		<variable name="node-list3" type="document" />
+		<variable name="node-list4" type="document" />
+		<variable name="node-list5" type="document" />
+		<variable name="node-list6" type="document" />
+
+		<assign fromexpr="$dataset1//Performances"
+			outputvariable="node-list1" />
+
+		<assign fromexpr="$dataset2//Performance/Month"
+			outputvariable="node-list2" />
+
+		<assign fromexpr="$dataset2/*" outputvariable="node-list3" />
+
+		<assign fromexpr="$dataset1//Rate" outputvariable="node-list4" />
+
+		<assign fromexpr="$dataset2/Quarter-2"
+			outputvariable="node-list5" />
+		<display message="node-list5 is " variable="node-list5" />
+
+		<assign fromexpr="$dataset1/Quarter-1"
+			outputvariable="node-list6" />
+
+		<display message="node-list6 is " variable="node-list6" />
+
+		<merge inputvariables="node-list1,node-list2"
+			outputvariable="result-node-list" />
+
+		<display message="result-node-list is "
+			variable="result-node-list" />
+
+
+		<merge inputvariables="node-list1,node-list3"
+			outputvariable="result-node-list" />
+
+		<display message="result-node-list is "
+			variable="result-node-list" />
+
+		<merge inputvariables="node-list2,node-list4"
+			outputvariable="result-node-list" />
+
+		<display message="result-node-list is "
+			variable="result-node-list" />
+
+		<merge inputvariables="node-list5,node-list6"
+			outputvariable="result-node-list" />
+
+		<display message="result-node-list is "
+			variable="result-node-list" />
+
+
+</mashup>

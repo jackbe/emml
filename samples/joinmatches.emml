@@ -1,0 +1,61 @@
+<!-- This work is licensed under a Creative Commons Attribution-Share Alike 3.0 United States License. 
+	 See http://creativecommons.org/licenses/by-sa/3.0/us for the full text. -->
+
+
+<mashup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.openmashup.org/schemas/v1.0/EMML/../schemas/EMMLSpec.xsd"
+        xmlns="http://www.openmashup.org/schemas/v1.0/EMML"
+ name="JoinUsingMatches">
+
+        <input name="companyProfiles" type="document">
+            <profiles>
+                <profile>
+                  <companyname>Apple Inc.</companyname>
+                  <address>1 Infinite LoopCupertino, CA95014United States</address>
+                </profile>
+                <profile>
+                  <companyname>Apple Inc.</companyname>
+                  <address>1 Infinite LoopCupertino, CA95014United States</address>
+                </profile>
+                <profile>
+                  <companyname>Google Inc.</companyname>
+                  <address>1600 Amphitheatre ParkwayMountain View, CA94043United States</address>
+                </profile>
+                <profile>
+                  <companyname>Sun Microsystems Inc.</companyname>
+                  <address>4150 Network CircleSanta Clara, CA95054United States</address>
+                </profile>
+                <profile>
+                  <companyname>Sun Microsystems Inc.</companyname>
+                  <address>4150 Network Circle, Menlo Park, CA95054United States</address>
+                </profile>
+            </profiles>
+        </input>
+
+        <input name="location" type="document">
+            <county>
+                <city>
+                    <name>cupertino</name><population>60000</population>
+                </city>
+                <city>
+                    <name>mountain view</name><population>40000</population>
+                </city>
+                <city>
+                    <name>santa clara</name><population>50000</population>
+                </city>
+                <city>
+                    <name>menlo park</name><population>20000</population>
+                </city>
+            </county>
+        </input>
+
+        <output name="result" type="document"/>
+
+         <!-- Join datasets using match operator  '~' e.g. join records with city names & their occorunces in address field.
+         -->
+         <join outputvariable="result"
+               joincondition="$location/county/city/name ~ $companyProfiles/profiles/profile/address"
+               />
+
+ </mashup>
+        

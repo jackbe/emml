@@ -1,0 +1,45 @@
+<!-- This work is licensed under a Creative Commons Attribution-Share Alike 3.0 United States License. 
+	 See http://creativecommons.org/licenses/by-sa/3.0/us for the full text. -->
+
+<mashup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.openmashup.org/schemas/v1.0/EMML/../schemas/EMMLSpec.xsd"
+        xmlns="http://www.openmashup.org/schemas/v1.0/EMML"
+        name="FeedAggregationSample">
+        <emml-meta name="author">Raj Krishnamurthy(raj@jackbe.com)</emml-meta>
+    
+        <output name="result" type="document"/>
+
+		<variables>
+			<variable name="feed1" type="document"/>
+			<variable name="feed2" type="document"/>
+			<variable name="feed3" type="document"/>
+			<variable name="mytitle" type="string" default="my news"/>
+			<variable name="ftype" type="string" default="atom_1.0"/>
+			<variable name="tmpfeed" type="string" />
+
+		</variables>
+        <!-- Aggregate Feeds. -->
+
+        <!-- Invoke multiple services in parallel -->
+        <parallel>
+            <sequence>
+                <directinvoke endpoint="http://planetjdk.org/feed.atom-1.0" outputvariable="feed1"/>
+            </sequence>
+
+            <sequence>
+                <directinvoke endpoint="http://ajaxian.com/index.xml" outputvariable="feed2"/>
+            </sequence>
+
+            <sequence>
+                <directinvoke endpoint="http://feeds.feedburner.com/ProgrammableWeb" outputvariable="feed3"/>
+            </sequence>
+
+        </parallel>
+
+        <!-- Merge multiple feeds into aggregate document-->
+
+        <merge inputvariables="feed1, feed2, feed3" feedtype="$ftype" title="$mytitle" description="{$feed1/*:feed/*:subtitle/text()}" author="{$feed1/*:feed/*:creator/text()}" outputvariable="result"/>
+
+		<display expr="$result//*:title"/>
+
+</mashup>

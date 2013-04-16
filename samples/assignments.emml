@@ -1,0 +1,81 @@
+<!-- This work is licensed under a Creative Commons Attribution-Share Alike 3.0 United States License. 
+	 See http://creativecommons.org/licenses/by-sa/3.0/us for the full text. -->
+
+
+<mashup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.openmashup.org/schemas/v1.0/EMML/../schemas/EMMLSpec.xsd"
+        xmlns="http://www.openmashup.org/schemas/v1.0/EMML"
+    name="AssisgnExpressionsSample"  >
+    
+        <emml-meta name="author">Raj Krishnamurthy(raj@jackbe.com)</emml-meta>
+
+        <output name="doc4" type="document">
+               <match venue="Port of Spain">
+                       <team1>India</team1>
+                       <team2>Sri Lanka</team2>
+               </match>
+       </output>
+
+        <variables>
+        <variable name="doc1" type="document">
+                <matches>
+                    <match>
+                        <team1>India</team1>
+                        <team2>Bermuda</team2>
+                        <venue>Trinidad</venue>
+                    </match>
+                    <match>
+                        <team1>India</team1>
+                        <team2>Sri Lanka</team2>
+                        <venue>Port of Spain</venue>
+                    </match>
+                    <match>
+                        <team1>England</team1>
+                        <team2>Canada</team2>
+                        <venue>St Lucia</venue>
+                    </match>
+                </matches>
+        </variable>
+        <variable name="doc2" type="document">
+                <bets>
+                    <odd>
+                        <for-it>18</for-it>
+                        <against>30</against>
+                    </odd>
+                     <odd>
+                        <for-it>15</for-it>
+                        <against>30</against>
+                    </odd>
+                    <odd>
+                        <for-it>25</for-it>
+                        <against>20</against>
+                    </odd>
+                </bets>
+        </variable>
+
+        <variable name="doc3" type="document">
+                 <odd>
+                     <for-it>18</for-it>
+                     <against>30</against>
+                 </odd>
+        </variable>
+        
+        </variables>
+        
+		<!-- Select source & destination nodes using xpath expression --> 
+		<assign fromexpr="$doc2/bets/odd[last()]" toexpr="$doc1/matches/match[team1='India']"/>
+        <display message="doc1 after change is " variable="doc1"/>
+
+        <!-- select precise desintation node using xpath expression -->
+        <assign fromvariable="$doc3" toexpr="$doc1/matches/match[team1='England']"/>
+        <display message="doc1 after change is " variable="doc1"/>
+
+        <!-- Assign literal to xpath-based desintation node-->
+	    <assign literal="Lords"  toexpr="$doc1/matches/match/venue"/>
+	     <display message="doc1 after change is " variable="doc1"/>
+
+	    <assign literal="Lords"  toexpr="$doc4/match/@venue"/>
+	     <display message="doc4 after change is " variable="doc4"/>
+
+
+</mashup>

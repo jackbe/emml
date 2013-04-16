@@ -1,0 +1,26 @@
+<!-- This work is licensed under a Creative Commons Attribution-Share Alike 3.0 United States License. 
+	 See http://creativecommons.org/licenses/by-sa/3.0/us for the full text. -->
+
+
+<mashup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ 	xsi:schemaLocation="http://www.openmashup.org/schemas/v1.0/EMML/../schemas/EMMLSpec.xsd"
+ 	xmlns="http://www.openmashup.org/schemas/v1.0/EMML"
+ 	xmlns:ns="http://webservices.amazon.com/AWSECommerceService/2008-06-26"
+ 	xmlns:macro="http://www.openmashup.org/schemas/v1.0/EMMLMacro"
+ 	name="AmazonReviewLists2">
+
+        <emml-meta name="author">Raj Krishnamurthy(raj@jackbe.com)</emml-meta>
+    
+        <input name="itemId" type="string" default="B000EXS1BS"/>
+        <input name="rating" type="string" default="2"/>
+        <output name="result" type="string"/>
+
+		<variables>
+        	<variable name="httpResponse.Content-Type" type="string" default="application/csv"/>
+        	<variable name="httpResponse.Content-Disposition" type="string" default="attachment; filename=mysample.txt"/>
+        	<variable name="httpResponse.Pragma" type="string" default="no-cache"/>
+        	<variable name="httpResponse.Expires" type="string" default="0"/>
+		</variables>
+		<directinvoke endpoint="http://local.yahooapis.com/MapsService/V1/trafficData" appid="YdnDemo" radius="80" city="WalnutCreek" state="CA" outputvariable="trafficData" />
+        <macro:FormatAsCSV xmldoc="$trafficData" outputvariable="result"/>
+</mashup>

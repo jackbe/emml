@@ -1,0 +1,59 @@
+<!-- This work is licensed under a Creative Commons Attribution-Share Alike 3.0 United States License. 
+	 See http://creativecommons.org/licenses/by-sa/3.0/us for the full text. -->
+
+
+<mashup name="SOAPService"
+                     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                     xsi:schemaLocation="http://www.openmashup.org/schemas/v1.0/EMML/../schemas/EMMLSpec.xsd"
+                     xmlns="http://www.openmashup.org/schemas/v1.0/EMML">
+        <emml-meta name="author">Raj Krishnamurthy(raj@jackbe.com)</emml-meta>
+    
+        <output name="result" type="document"/>
+
+		<variables>
+        	<input name="soapEndpoint" type="string" default="http://www.weather.gov/forecasts/xml/SOAP_server/ndfdXMLserver.php"/>
+        	<input name="soapHeader" type="document"/>
+        	<input name="soapBody" type="document">
+    			<ns5689:LatLonListSubgrid xmlns:ns5689="uri:DWMLgen" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+      				<lowerLeftLatitude xsi:type="xsd:string">35.00</lowerLeftLatitude>
+      				<lowerLeftLongitude xsi:type="xsd:string">-82.00</lowerLeftLongitude>
+      				<upperRightLatitude xsi:type="xsd:string">35.5</upperRightLatitude>
+      				<upperRightLongitude xsi:type="xsd:string">-81.50</upperRightLongitude>
+      				<resolution xsi:type="xsd:string">20.0</resolution>
+    			</ns5689:LatLonListSubgrid>
+			</input>
+        <input name="soapAction" type="string" default=""/>
+		</variables>
+
+
+		<!-- SOAP Service sample US National Weather Service :  
+				http://www.nws.noaa.gov/xml/
+		-->
+        <constructor outputvariable="soapRequest">
+            <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+                           xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                     		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                           xmlns:enc="http://schemas.xmlsoap.org/soap/encoding" >
+                <soap:Header>
+                    {$soapHeader}
+                </soap:Header>
+                <soap:Body>
+                    {$soapBody}
+                </soap:Body>
+            </soap:Envelope>
+        </constructor>
+
+        <constructor outputvariable="httpHeader">
+            <headers>
+                <SOAPAction>{$soapAction}</SOAPAction>
+                <Content-type>text/xml</Content-type>
+            </headers>
+        </constructor>
+
+        <directinvoke endpoint= "$soapEndpoint"
+                        method="post"
+                        requestbody="$soapRequest"
+                        header="$httpHeader"
+                        outputvariable="result"/>
+        
+</mashup>

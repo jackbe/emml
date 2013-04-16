@@ -1,0 +1,28 @@
+<!-- This work is licensed under a Creative Commons Attribution-Share Alike 3.0 United States License. 
+	 See http://creativecommons.org/licenses/by-sa/3.0/us for the full text. -->
+<mashup xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+xsi:schemaLocation='http://www.openmashup.org/schemas/v1.0/EMML/../schemas/EMMLPrestoSpec.xsd'
+xmlns='http://www.openmashup.org/schemas/v1.0/EMML'
+xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+xmlns:ns="http://purl.org/rss/1.0/"
+name='CraigListSearchAndSort'>
+  
+	<emml-meta name="author">Raj Krishnamurthy(raj@jackbe.com)</emml-meta>
+
+	<input name="search" type="string" default="Laptop"/>
+
+	<output name='resultDoc' type='document' />
+
+	<!-- Invoke RSS Feed -->
+	<directinvoke endpoint='http://sfbay.craigslist.org/sys/index.rss' method='GET' outputvariable="allSystems" />
+
+	<!-- filter RSS feed for item description that matches the given input param
+		matches is xpath regular epxression function. 
+	-->
+	<filter inputvariable='allSystems' filterexpr="/rdf:RDF/ns:item[matches(ns:title, $search, 'i')]"   outputvariable='searchResult' />
+
+
+	<sort inputvariable="searchResult" sortexpr="/rdf:RDF/ns:item" sortkeys="ns:title ascending" outputvariable="resultDoc" />
+  
+	<!-- value stored in output variable named jobsDoc is returned from this Mashup Service -->
+</mashup>

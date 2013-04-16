@@ -1,0 +1,58 @@
+<!-- This work is licensed under a Creative Commons Attribution-Share Alike 3.0 United States License. 
+	 See http://creativecommons.org/licenses/by-sa/3.0/us for the full text. -->
+
+
+<mashup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml"
+  xsi:schemaLocation="http://www.openmashup.org/schemas/v1.0/EMML/../schemas/EMMLSpec.xsd"
+  xmlns="http://www.openmashup.org/schemas/v1.0/EMML" name="GoogleFinanceNews">
+
+        <input name="ticker" type="string" default="GOOG"/>
+		<output name="result" type="document"/>
+
+        <variables>
+          <variable name="source" type="string"/>
+          <variable name="source_date" type="string"/>
+          <variable name="title" type="string"/>
+          <variable name="url" type="string"/>
+          <variable name="wholeURL" type="string"/>
+        </variables>
+
+<!-- Google Finance has news feeds on an equity or stock.
+	This mashup clips off this data which can be repurposed inside another mashup
+	that shows financial information about a ticker -->
+
+        <template expr="http://finance.google.com/finance?q={$ticker}" outputvariable="wholeURL"/>
+    
+<!-- invoke the Google Finance web page that has news information -->
+
+        <directinvoke outputvariable = "clipresult" endpoint="$wholeURL"/>
+
+		<assign fromexpr="$clipresult//xhtml:div[@id='newsouterdiv']" outputvariable="clipresult2"/>
+		<assign fromexpr="$clipresult2//xhtml:table" outputvariable="clipresult3"/>
+
+		<!-- loop through the table -->
+		<foreach variable="query" items="$clipresult3">
+
+			<assign fromexpr="$query//xhtml:td[@class='title']" outputvariable="data"/>
+			<assign fromexpr="$query//xhtml:td[@class='source']" outputvariable="data2"/>
+			<assign fromexpr="$data//xhtml:a/string()" outputvariable="title"/>
+			<assign fromexpr="$data//xhtml:a/@href" outputvariable="url"/>
+			<assign fromexpr="substring-before($data2,'-')"  outputvariable="source"/>
+			<assign fromexpr="$data2//xhtml:span[@class='date']/string()" outputvariable="source_date"/>
+
+			 <!-- build the  xml result -->
+
+			<appendresult outputvariable="result">
+				   <stocknews_item>
+					 <ticker>{$ticker}</ticker>
+					 <title>{$title}</title>
+					 <url>{$url}</url>
+					 <newssource>{$source}</newssource>
+					 <sourcedate>{$source_date}</sourcedate>
+					 <source>Google Finance</source>
+				   </stocknews_item>
+			</appendresult>
+		</foreach>
+
+</mashup>

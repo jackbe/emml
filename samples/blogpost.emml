@@ -1,0 +1,102 @@
+<!-- This work is licensed under a Creative Commons Attribution-Share Alike 3.0 United States License. 
+	 See http://creativecommons.org/licenses/by-sa/3.0/us for the full text. -->
+
+
+<mashup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.openmashup.org/schemas/v1.0/EMML/../schemas/EMMLSpec.xsd"
+        xmlns="http://www.openmashup.org/schemas/v1.0/EMML"
+    name="GoogleBlogService">
+        <emml-meta name="author">Raj Krishnamurthy(raj@jackbe.com)</emml-meta>
+    
+        <input name="thoughts" type="string" default = "JackBe’s Presto is an innovative Enterprise Web 2.0 Mashup Platform that allows any user to easily access and mashup any data from any application to improve their decision making and enhance their collaboration."/>
+        <output name="blogstatus" type="document"/>
+
+
+        <variables>
+
+            <!-- HTTP Header -->        
+            <variable name="reqheaders" type="document">
+                <headers>
+                    <Content-type>application/x-www-form-urlencoded</Content-type>
+                </headers>
+            </variable>
+            
+            <variable name="auth" type="string"/>
+            <variable name="xmlPost" type="string"/>
+            <variable name="result" type="string"/>
+        </variables>
+
+        <!-- Creates a blog entry using Google Blogger API.
+             This blog entry can be accessed at http://jackbemashup.blogspot.com/ -->
+
+        <!-- Login using Google Authentication API
+             <directinvoke/> can be used for accessing any URL endpoint.
+                method='post' implies HTTP POST request
+                header attribute can be used for sending HTTP headers
+                other attributes are sent to invoked endpoint as parameters.
+        -->
+        <directinvoke endpoint="https://www.google.com/accounts/ClientLogin"
+                        method="post"
+                        accountType="GOOGLE"
+                        Email="jackbe.team@gmail.com"
+                        Passwd= "jackbejack"
+                        service="blogger"
+                        source="jackbe-jems-1"
+                        header="$reqheaders"
+                        outputvariable="result"/>
+
+        <!-- Javascript snippet is used to extract authentication token that is required for subsequent calls
+        -->
+        <script type="text/javascript" inputvariables="result" outputvariable="auth">
+            <![CDATA[
+            var r = new String(result)
+            var ar = r.split("=");
+            auth = ar[ar.length-1];
+            auth = auth.slice(0, -1)
+            ]]>
+        </script>
+
+        <!-- Construct a Blog Entry -->
+        <constructor outputvariable="xmlPost">
+            <![CDATA[
+                <entry xmlns='http://www.w3.org/2005/Atom'>
+                        <title type='text'>Publishing from JackBe Mashup Server </title>
+                        <content type='xhtml'>
+                        <div xmlns="http://www.w3.org/1999/xhtml">
+                        <p>{$thoughts}</p>
+                        </div>
+                        </content>
+                        <author>
+                        <name>Raj</name>
+                        <email>raj@xyz.com</email>
+                        </author>
+                 </entry>
+            ]]>
+        </constructor>
+
+        <variables>
+            <variable name="bloggerURL" type="string" default="http://www.blogger.com/feeds/564882547508000453/posts/default"/>            
+            <variable name="myheader" type="document"/>
+        </variables>
+
+        <!-- Build HTTP Headers -->
+        <constructor outputvariable="myheader">
+                <header>
+                    <Authorization>GoogleLogin auth={$auth}</Authorization>
+                    <Content-Type>application/atom+xml</Content-Type>
+                </header>
+        </constructor>
+
+        <display message="myheader" variable="myheader"/>
+
+        <!-- Use Google Blogger API to post a blog.
+             requestbody attribute is used to send any POST payload -->
+        <directinvoke endpoint="$bloggerURL"
+                        outputvariable="blogstatus"
+                        method="post"
+                        header="$myheader"
+                        requestbody="$xmlPost" />
+
+        <display message="result=" variable="blogstatus"/>
+
+</mashup>

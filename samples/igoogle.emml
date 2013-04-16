@@ -1,0 +1,79 @@
+<!-- This work is licensed under a Creative Commons Attribution-Share Alike 3.0 United States License. 
+	 See http://creativecommons.org/licenses/by-sa/3.0/us for the full text. -->
+
+
+<mashup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openmashup.org/schemas/v1.0/EMML/../schemas/EMMLSpec.xsd"
+	xmlns="http://www.openmashup.org/schemas/v1.0/EMML"
+	xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    name="MyGooglePage">
+    <emml-meta name="author">Satya Prakash(satya.prakash@jackbe.com)</emml-meta>
+
+	<input name="email" type="string" default="jackbe.team@gmail.com" />
+	<input name="password" type="string" default="jackbejack" />
+	<input name="apikey" type="string"
+		default="ABQIAAAAzc6elecmMGt39hF6nig6VhT2yXp_ZAY8_ufC3CFXhHIE1NvwkxRUCcZkRUt1acR1N5ZmWeIvi8_c-w" />
+
+
+    <output name="bolds" type="document" />
+
+    <!-- Mashup Sample access contents in My Google Page -->
+
+	<variables>
+	    <!-- HTTP Header -->
+        <variable name="authheader" type="document">
+            <headers>
+                <Content-type>application/x-www-form-urlencoded</Content-type>
+            </headers>
+        </variable>
+
+		<variable name="auth" type="string" />
+		<variable name="result" type="document" />
+		<variable name="itemsresult" type="document" />
+		<variable name="responseHeader" type="document" />
+		<variable name="redirecturl" type="string" />
+		<variable name="responseCode" type="string" />
+		<variable name="cookies" type="document" />
+	</variables>
+
+    <!-- Login to iGoogle service -->
+	<directinvoke endpoint="https://www.google.com/accounts/ServiceLoginAuth"
+		method="post" Email="$email" Passwd="$password" responsecode="$responseCode" 
+		service="ig" header="$authheader" responseheader="$responseHeader" 
+		passive="true" continue="http://www.google.co.in/ig%3Fhl%3Den"
+		cookies="$cookies" outputvariable="result" />
+
+	<display message="Result is :" variable="result" />
+	<display message="Result Headers of POST call is"
+			variable="responseHeader" />
+	<display message="responseCode is" variable="responseCode" />
+	
+    <!-- iGoogle auth service returns re-direct HTTP response -->	
+	<if condition="number($responseCode)=302">
+
+            <!-- extract redirect Location URI from HTTP response header -->
+			<assign fromexpr="$responseHeader//Location/string()" outputvariable="redirecturl" />
+
+			<display message="Redirecting to .." variable="redirecturl" />
+
+            <!-- invoke redirected URL and pass-along cookies returned from previous call -->
+			<directinvoke endpoint="$redirecturl" cookies="$cookies" outputvariable="result"/>
+			
+            <!-- once authenticated, invoke manageAccounts HTML page.
+                    HTML is parsed and stored as XHTML model in result  -->
+			<directinvoke endpoint="https://www.google.com/accounts/ManageAccount" cookies="$cookies"
+			        outputvariable="result"/>
+
+            <!-- Extract data from MyGoogle Accounts HTML page -->
+			<foreach variable="query" items="$result//xhtml:b">
+				<appendresult outputvariable="bolds">
+					<b>{$query/string()}</b>
+				</appendresult>
+			</foreach>
+				
+			<display message="Bold links:" variable="bolds" />	
+			
+			
+	</if>
+
+</mashup>

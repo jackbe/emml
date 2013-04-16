@@ -1,0 +1,30 @@
+<mashup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.openemml.org/2009-04-15/
+EMMLSchema ../schemas/EMMLSpec.xsd"
+        xmlns="http://www.openmashup.org/schemas/v1.0/EMML"
+ name="ModifyDocument">
+
+	<output name="result" type="document" >	
+		<items>
+			<item>
+				<name>foo1</name>
+				<price>100</price>
+			</item>
+			<item>
+				<name>foo2</name>
+				<price>200</price>
+			</item>
+			<item>
+				<name>foo3</name>
+				<price>300</price>
+			</item>
+		</items>
+	</output>
+
+	<!-- update names in upper-case -->
+	<assign fromexpr="$result//item/name/upper-case(string())" toexpr="$result//item/name" mode="replace"/>	
+
+	<!-- update price with computation based on self -->
+	<assign fromexpr="$result//item/price/(number()*10)" toexpr="$result//item/price" mode="replace" />	
+
+</mashup>

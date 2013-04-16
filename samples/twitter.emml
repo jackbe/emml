@@ -1,0 +1,17 @@
+<!-- This work is licensed under a Creative Commons Attribution-Share Alike 3.0 United States License. 
+	 See http://creativecommons.org/licenses/by-sa/3.0/us for the full text. -->
+
+
+<mashup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.openmashup.org/schemas/v1.0/EMML/../schemas/EMMLSpec.xsd"
+        xmlns="http://www.openmashup.org/schemas/v1.0/EMML"
+        name="TwitterSearch">
+        <emml-meta name="author">Raj Krishnamurthy(raj@jackbe.com)</emml-meta>
+
+   		<input name="query" type="string" default="cricket"/> 
+    	<output name="tweets" type="document"/>
+
+		<directinvoke endpoint="http://search.twitter.com/search.atom?q={$query}" outputvariable="tweets"/>
+
+
+</mashup>

@@ -1,0 +1,67 @@
+<!-- This work is licensed under a Creative Commons Attribution-Share Alike 3.0 United States License. 
+	 See http://creativecommons.org/licenses/by-sa/3.0/us for the full text. -->
+
+
+<mashup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openmashup.org/schemas/v1.0/EMML/../schemas/EMMLSpec.xsd"
+	xmlns="http://www.openmashup.org/schemas/v1.0/EMML"
+	xmlns:xhtml="http://www.w3.org/1999/xhtml"
+	xmlns:macro = "http://www.openmashup.org/schemas/v1.0/EMMLMacro"
+    name="MacrosSample">
+    <emml-meta name="author">Raj Krishnamurthy(raj@jackbe.com)</emml-meta>
+
+    <output name="request" type="document"/>
+
+
+    <!-- Macros are used to create re-usable EMML snippets.   
+         StringJoin Macro joins together element values with ','.
+     -->
+    <macro name="StringJoin">
+            <input name="inputexpr" type="string" />
+            <output name="stringResult" type="string" />
+
+            <assign fromexpr="string-join({$inputexpr}, ', ')" outputvariable="stringResult"/>
+    </macro>
+
+    <variable name="mydoc" type="document">
+        <items>
+            <item>foo1</item>
+            <item>foo2</item>
+            <item>foo3</item>
+        </items>
+    </variable>
+    <variable name="myresult" type="string"/>
+
+    <macro:StringJoin inputexpr="$mydoc//item" stringResult="myresult"/>
+
+    <display message="StringJoin output = " expr="$myresult"/>
+
+
+    <!-- Macro for creating Amazon Item Lookup Request. -->
+    <macro name="createLookupRequest">
+        <input name="itemId" type="string"/>
+        <output name="amazonRequest" type="document"/>
+
+        <constructor outputvariable="amazonRequest">
+            <ns:ItemLookup xmlns:ns="testuri">
+                <ns:SubscriptionId>0525E2PQ81DD7ZTWTK82</ns:SubscriptionId>
+                <ns:Validate>false</ns:Validate>
+                <ns:Request>
+                    <ns:ItemId>{$itemId}</ns:ItemId>
+                    <ns:IdType>ASIN</ns:IdType>
+                    <ns:ResponseGroup>Large</ns:ResponseGroup>
+                </ns:Request>
+            </ns:ItemLookup>
+        </constructor>
+
+    </macro>
+
+    <macro:createLookupRequest itemId="1010101" amazonRequest="request"/>
+    
+    <display message="Amazon lookup request = " expr="$request"/>
+
+    <macro:createLookupRequest itemId="2010101" amazonRequest="request"/>
+
+    <display message="Amazon lookup request = " expr="$request"/> 
+
+</mashup>
