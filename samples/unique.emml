@@ -1,0 +1,22 @@
+<!-- This work is licensed under a Creative Commons Attribution-Share Alike 3.0 United States License. 
+	 See http://creativecommons.org/licenses/by-sa/3.0/us for the full text. -->
+
+
+<mashup xmlns:xsi= "http://www.w3.org/2001/XMLSchema-instance"
+ 	 xsi:schemaLocation="http://www.openmashup.org/schemas/v1.0/EMML/../schemas/EMMLSpec.xsd"
+ 	 xmlns="http://www.openmashup.org/schemas/v1.0/EMML"
+ 	 xmlns:macro="http://www.openmashup.org/schemas/v1.0/EMMLMacro"
+ 	 name = "MergeUniqueItems">
+    <emml-meta name="author">Raj Krishnamurthy(raj@jackbe.com)</emml-meta>
+
+    <output name="result" type="document"/>
+
+    <directinvoke endpoint="http://www.nytimes.com/services/xml/rss/nyt/HomePage.xml" outputvariable="feed1"/>
+
+    <directinvoke endpoint="http://www.nytimes.com/services/xml/rss/nyt/World.xml" outputvariable="feed2"/>
+
+    <merge inputvariables="feed1, feed2" outputvariable="result"/>
+
+    <filter inputvariable="result" filterexpr="/rss/channel/item[not(preceding::title = ./title)]"
+                                        outputvariable="result"/>
+</mashup>

@@ -1,0 +1,26 @@
+<!-- This work is licensed under a Creative Commons Attribution-Share Alike 3.0 United States License. 
+	 See http://creativecommons.org/licenses/by-sa/3.0/us for the full text. -->
+
+
+<mashup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xsi:schemaLocation="http://www.openmashup.org/schemas/v1.0/EMML/../schemas/EMMLSpec.xsd"
+        xmlns="http://www.openmashup.org/schemas/v1.0/EMML"
+ name="GoogleWebClipping">
+        <emml-meta name="author">Raj Krishnamurthy(raj@jackbe.com)</emml-meta>
+    
+        <input name="query" type="string" default="ruby"></input>
+        <output name="result" type="document"/>
+
+        <variable name="searchresult1" type="document" subtype="HTML"/>
+
+        
+        <directinvoke outputvariable = "searchresult1"
+                    endpoint="http://www.google.com/search?q={$query}"/>
+
+        <foreach variable="query" items="$searchresult1//xhtml:a[@class='l']">
+            <appendresult outputvariable="result">
+                <itemlink>{$query/@href}</itemlink>
+            </appendresult>
+        </foreach>
+</mashup>

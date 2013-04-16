@@ -1,0 +1,99 @@
+<!-- This work is licensed under a Creative Commons Attribution-Share Alike 3.0 United States License. 
+	 See http://creativecommons.org/licenses/by-sa/3.0/us for the full text. -->
+
+
+<mashup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.openmashup.org/schemas/v1.0/EMML/../schemas/EMMLSpec.xsd"
+        xmlns="http://www.openmashup.org/schemas/v1.0/EMML"
+ name="FiltersSample">
+        <emml-meta name="author">Raj Krishnamurthy(raj@jackbe.com)</emml-meta>
+    
+    <output name="result" type="document"/>
+
+    <variables>
+        <variable name="pers" type="document">
+
+    <personnel>
+        <person id="Big.Boss">
+            <name>
+                <family>Boss</family>
+                <given>Big</given>
+            </name>
+            <email>chief@oxygenxml.com</email>
+            <link subordinates="one.worker two.worker three.worker four.worker five.worker"/>
+        </person>
+        <person id="one.worker">
+            <name>
+                <family>Worker</family>
+                <given>One</given>
+            </name>
+            <email>one@oxygenxml.com</email>
+            <link manager="Big.Boss"/>
+        </person>
+        <person id="two.worker">
+            <name>
+                <family>Worker</family>
+                <given>Two</given>
+            </name>
+            <email>two@oxygenxml.com</email>
+            <link manager="Big.Boss"/>
+        </person>
+        <person id="three.worker">
+            <name>
+                <family>Worker</family>
+                <given>Three</given>
+            </name>
+            <email>three@oxygenxml.com</email>
+            <link manager="Big.Boss"/>
+        </person>
+        <person id="four.worker">
+            <name>
+                <family>Worker</family>
+                <given>Four</given>
+            </name>
+            <email>four@oxygenxml.com</email>
+            <link manager="Big.Boss"/>
+        </person>
+        <person id="five.worker">
+            <name>
+                <family>Worker</family>
+                <given>Five</given>
+            </name>
+            <email>five@oxygenxml.com</email>
+            <link manager="Big.Boss"/>
+        </person>
+        <person id="six.worker">
+            <name>
+                <family>Worker</family>
+                <given>six</given>
+            </name>
+            <email>six@att.com</email>
+            <link manager="Big.SuperBoss"/>
+        </person>
+    </personnel>
+        
+        </variable>
+
+        <variable name="var1" type="string" default="oxygen"/>
+        <variable name="var2" type="string" default="four@oxygenxml.com"/>
+    </variables>
+
+    <filter inputvariable="pers"
+            filterexpr="/personnel/person[email = $var2]"
+            outputvariable="result" />
+
+    <display message="select person with four@oxygenxml.com = " expr="$result"/>
+
+    <filter inputvariable="pers" filterexpr="/personnel/person[position() = (1 to 3)]" outputvariable="result"/>
+
+    <display message="First 3 persons by position = "  expr="$result"/>
+
+
+    <filter inputvariable="pers"
+            filterexpr = "/personnel/person[matches(email, $var1)]"
+            outputvariable="result"/>
+
+    <display message="filtered result (with oxygen email)  = " expr="$result"/>
+
+
+</mashup>

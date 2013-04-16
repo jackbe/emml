@@ -1,0 +1,64 @@
+<!-- This work is licensed under a Creative Commons Attribution-Share Alike 3.0 United States License. 
+	 See http://creativecommons.org/licenses/by-sa/3.0/us for the full text. -->
+
+
+<mashup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.openmashup.org/schemas/v1.0/EMML/../schemas/EMMLSpec.xsd"
+        xmlns="http://www.openmashup.org/schemas/v1.0/EMML"
+ name="JavascriptSample">
+    <emml-meta name="author">Raj Krishnamurthy(raj@jackbe.com)</emml-meta>
+
+     <output name="CustomerOrder" type="document"/>
+
+     <constructor outputvariable="CustomerOrder">
+         <Invoice>
+             <Customer>
+                 <!-- data added in EMML -->
+                <name>FOO Inc.</name>
+                <street>Mt. Road</street>
+                <city>Walnut Creek</city>
+                <state>CA</state>    
+             </Customer>
+         </Invoice>
+     </constructor>
+
+
+    <!-- Presto Mashup server is integrated with Rhino Javascript engine.
+         EMML variables are available
+     -->
+    <script type="text/javascript" inputvariables="CustomerOrder" outputvariable="CustomerOrder">
+    <![CDATA[
+    
+            // EMML variables can be accessed inside javascript scope
+            print("EMML Variable in Javascript scope : " +  CustomerOrder);
+            print('customer name = ' + CustomerOrder.Customer.name);
+
+            // add attribute to EMML Variable - CustomerOrder
+            CustomerOrder.@Id = '1001';
+
+            // Add order details to EMML Variable - CustomerOrder
+
+            // Building Order details using E4X support in Rhino Javscript Engine.
+            // E4X also provides some xpath functionality
+            var order = <Order/>;
+            order.comment = 'Data added in javascript';
+            order.item[0] = "";
+            order.item[0].description = "Small Rodents";
+            order.item[0].quantity = 10;
+            order.item[0].price = 6.95;
+
+            print('The order after appending a new item is:');
+            print(order);
+
+            // append a new item to the order
+            order.item += <item><description>Catapult</description><price>139.95</price></item>;
+
+            CustomerOrder.order = order;
+
+    ]]>
+    </script>
+    <!-- EMML Variables modified in Javascript, is reflected back in EMML scope -->
+
+    <display message="Display Order Details added using Javascript : " expr="$CustomerOrder//Order/item"/>
+
+</mashup>

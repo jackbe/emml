@@ -1,0 +1,70 @@
+<!-- This work is licensed under a Creative Commons Attribution-Share Alike 3.0 United States License. 
+	 See http://creativecommons.org/licenses/by-sa/3.0/us for the full text. -->
+
+
+<mashup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.openmashup.org/schemas/v1.0/EMML/../schemas/EMMLSpec.xsd"
+    xmlns="http://www.openmashup.org/schemas/v1.0/EMML"
+    name="GroovySample">
+
+    <emml-meta name="author">Satya Prakash(satya.prakash@jackbe.com)</emml-meta>
+
+    <input name="input" type="document">
+        <shopping>
+            <category type="groceries">
+                <item>Chocolate</item>
+                <item>Coffee</item>
+            </category>
+            <category type="supplies">
+                <item>Paper</item>
+                <item quantity="4">Pens</item>
+            </category>
+            <category type="present">
+                <item when="Aug 10">Kathryn's Birthday</item>
+            </category>
+        </shopping>
+    </input>
+
+    <output name="output" type="document"/>
+    <display message="Austin powers: Lets make this groovier" variable="input" />
+    <script type="groovy" inputvariables="$input" outputvariable="$output">
+        <![CDATA[
+            import groovy.xml.dom.DOMUtil
+            import groovy.xml.dom.DOMCategory
+            import groovy.xml.DOMBuilder
+            
+            
+            def reader  = new StringReader(input)
+            def doc     = DOMBuilder.parse(reader)
+            def root    = doc.documentElement
+            
+            use(DOMCategory) {
+                // modify groceries: quality items please
+                def groceries = root.category.findAll{ it.'@type' == 'groceries' }[0].item
+                groceries.each { g ->
+                    g.value = 'Luxury ' + g.text()
+                }
+            
+                // modify supplies: we need extra pens
+                def supplies = root.category.findAll{ it.'@type' == 'supplies' }[0].item
+                supplies.findAll{ it.text() == 'Pens' }.each { s ->
+                    s['@quantity'] = s.'@quantity'.toInteger() + 2
+                    s['@when'] = 'Urgent'
+                }
+            
+                // modify presents: August has come and gone
+                def presents = root.category.find{ it.'@type' == 'present' }
+                presents.item.each {
+                    presents.removeChild(it)
+                }
+                presents.appendNode('item', "Mum's Birthday")
+                presents.appendNode('item', [when:'Oct 15'], "Monica's Birthday")
+            
+            }             
+            
+            output = DOMUtil.serialize(root)
+        ]]>
+    </script>
+    <display message="Austin powers:Aint the output groovy?" variable="output" />
+    
+</mashup>    

@@ -1,0 +1,80 @@
+<!-- This work is licensed under a Creative Commons Attribution-Share Alike 3.0 United States License. 
+	 See http://creativecommons.org/licenses/by-sa/3.0/us for the full text. -->
+
+
+<mashup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xsi:schemaLocation="http://www.openmashup.org/schemas/v1.0/EMML/../schemas/EMMLSpec.xsd"
+        xmlns="http://www.openmashup.org/schemas/v1.0/EMML"
+ name="HttpMethodsSample">
+        <emml-meta name="author">Raj Krishnamurthy(raj@jackbe.com)</emml-meta>
+    
+        <output name="result" type="document"/>
+
+
+	    <variable name="optionsResponseHeader" type="document" />	
+        <directinvoke outputvariable = "optionsResponse"
+			method="options"
+			responseheader = "optionsResponseHeader"
+            endpoint="http://localhost:5000/ptest/1000"/>
+
+	    <variable name="headResponseHeader" type="document" />	
+        <directinvoke outputvariable = "headResponse"
+			method="head"
+			responseheader = "headResponseHeader"
+            endpoint="http://localhost:5000/ptest/1000"/>
+
+        <directinvoke outputvariable = "getResponse"
+                    endpoint="http://localhost:5000/ptest/1000"/>
+
+        <!-- Build HTTP Headers -->
+        <constructor outputvariable="myheader">
+                <header>
+                    <Authorization>GoogleLogin auth=asdkfjalsdkfjsdlk</Authorization>
+                    <Content-Type>application/xml</Content-Type>
+                </header>
+        </constructor>
+
+	    <constructor outputvariable="myrequest"> 
+	        <request> 
+                <id>2930293480239</id>
+                <level>10101</level>
+	        </request> 
+	    </constructor> 
+	    	
+
+        <directinvoke outputvariable = "postResponse" 
+            method="post"
+            header="$myheader"
+            requestbody="$myrequest" 
+            endpoint="http://localhost:5000/ptest/1001?p1=v1"/>
+
+        <directinvoke outputvariable = "putResponse" 
+            method="put"
+            header="$myheader"
+            requestbody="$myrequest" 
+            endpoint="http://localhost:5000/ptest/1002?p1=v1"/>
+
+        <directinvoke outputvariable = "deleteResponse" 
+            method="delete"
+            header="$myheader"
+            requestbody="$myrequest" 
+            endpoint="http://localhost:5000/ptest/1003"/>
+
+	    <constructor outputvariable="result"> 
+         <result> 
+          <options>{$optionsResponseHeader//Allow}</options>
+          <head>{$headResponseHeader}</head>
+          {$getResponse} 
+          <get>{$getResponse//data}</get>
+          {$postResponse}
+          <post>{$postResponse//data}</post>
+          {$putResponse}
+          <put>{$putResponse//data}</put>
+          {$deleteResponse}
+	        <delete>{$deleteResponse//data}</delete>
+	    </result> 
+	    </constructor> 
+	    	
+
+</mashup>

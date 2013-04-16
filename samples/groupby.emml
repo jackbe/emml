@@ -1,0 +1,257 @@
+<!-- This work is licensed under a Creative Commons Attribution-Share Alike 3.0 United States License. 
+	 See http://creativecommons.org/licenses/by-sa/3.0/us for the full text. -->
+
+
+<mashup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.openmashup.org/schemas/v1.0/EMML/../schemas/EMMLSpec.xsd"
+	xmlns="http://www.openmashup.org/schemas/v1.0/EMML"
+	name="GroupbyService">
+
+        <emml-meta name="author">Satya Prakash(satya.prakash@jackbe.com)</emml-meta>
+	
+				<output name="groupedResult" type="document" />
+		<variables>
+			<variable name="catalog" type="document">
+				<catalog>
+					<book id="bk101">
+						<author>Gambardella, Matthew</author>
+						<title>XML Developer's Guide</title>
+						<genre>Computer</genre>
+						<price>44.95</price>
+						<copiessold>100</copiessold>
+						<publish_date>2000-10-01</publish_date>
+						<description>
+							An in-depth look at creating applications
+							with XML.
+						</description>
+					</book>
+					<book id="bk102">
+						<author>Ralls, Kim</author>
+						<title>Midnight Rain</title>
+						<genre>Fantasy</genre>
+						<price>5.95</price>
+						<copiessold>200</copiessold>
+						<publish_date>2000-12-16</publish_date>
+						<description>
+							A former architect battles corporate
+							zombies, an evil sorceress, and her own
+							childhood to become queen of the world.
+						</description>
+					</book>
+					<book id="bk103">
+						<author>Corets, Eva</author>
+						<title>Maeve Ascendant</title>
+						<genre>Fantasy</genre>
+						<price>5.95</price>
+						<copiessold>300</copiessold>
+						<publish_date>2000-11-17</publish_date>
+						<description>
+							After the collapse of a nanotechnology
+							society in England, the young survivors lay
+							the foundation for a new society.
+						</description>
+					</book>
+					<book id="bk104">
+						<author>Corets, Eva</author>
+						<title>Oberon's Legacy</title>
+						<genre>Fantasy</genre>
+						<price>5.95</price>
+						<copiessold>700</copiessold>
+						<publish_date>2001-03-10</publish_date>
+						<description>
+							In post-apocalypse England, the mysterious
+							agent known only as Oberon helps to create a
+							new life for the inhabitants of London.
+							Sequel to Maeve Ascendant.
+						</description>
+					</book>
+					<book id="bk105">
+						<author>Corets, Eva</author>
+						<title>The Sundered Grail</title>
+						<genre>Fantasy</genre>
+						<price>5.95</price>
+						<copiessold>400</copiessold>
+						<publish_date>2001-09-10</publish_date>
+						<description>
+							The two daughters of Maeve, half-sisters,
+							battle one another for control of England.
+							Sequel to Oberon's Legacy.
+						</description>
+					</book>
+					<book id="bk106">
+						<author>Randall, Cynthia</author>
+						<title>Lover Birds</title>
+						<genre>Romance</genre>
+						<price>4.95</price>
+						<copiessold>600</copiessold>
+						<publish_date>2000-09-02</publish_date>
+						<description>
+							When Carla meets Paul at an ornithology
+							conference, tempers fly as feathers get
+							ruffled.
+						</description>
+					</book>
+					<book id="bk107">
+						<author>Thurman, Paula</author>
+						<title>Splish Splash</title>
+						<genre>Romance</genre>
+						<price>4.95</price>
+						<copiessold>100</copiessold>
+						<publish_date>2000-11-02</publish_date>
+						<description>
+							A deep sea diver finds true love twenty
+							thousand leagues beneath the sea.
+						</description>
+					</book>
+					<book id="bk108">
+						<author>Knorr, Stefan</author>
+						<title>Creepy Crawlies</title>
+						<genre>Horror</genre>
+						<price>4.95</price>
+						<copiessold>1000</copiessold>
+						<publish_date>2000-12-06</publish_date>
+						<description>
+							An anthology of horror stories about
+							roaches, centipedes, scorpions and other
+							insects.
+						</description>
+					</book>
+					<book id="bk109">
+						<author>Kress, Peter</author>
+						<title>Paradox Lost</title>
+						<genre>Science Fiction</genre>
+						<price>6.95</price>
+						<copiessold>400</copiessold>
+						<publish_date>2000-11-02</publish_date>
+						<description>
+							After an inadvertant trip through a
+							Heisenberg Uncertainty Device, James Salway
+							discovers the problems of being quantum.
+						</description>
+					</book>
+					<book id="bk110">
+						<author>O'Brien, Tim</author>
+						<title>
+							Microsoft .NET: The Programming Bible
+						</title>
+						<genre>Computer</genre>
+						<price>36.95</price>
+						<copiessold>10</copiessold>
+						<publish_date>2000-12-09</publish_date>
+						<description>
+							Microsoft's .NET initiative is explored in
+							detail in this deep programmer's reference.
+						</description>
+					</book>
+					<book id="bk111">
+						<author>O'Brien, Tim</author>
+						<title>MSXML3: A Comprehensive Guide</title>
+						<genre>Computer</genre>
+						<price>36.95</price>
+						<copiessold>20</copiessold>
+						<publish_date>2000-12-01</publish_date>
+						<description>
+							The Microsoft MSXML3 parser is covered in
+							detail, with attention to XML DOM
+							interfaces, XSLT processing, SAX and more.
+						</description>
+					</book>
+					<book id="bk112">
+						<author>Galos, Mike</author>
+						<title>
+							Visual Studio 7: A Comprehensive Guide
+						</title>
+						<genre>Computer</genre>
+						<price>49.95</price>
+						<copiessold>10</copiessold>
+						<publish_date>2001-04-16</publish_date>
+						<description>
+							Microsoft Visual Studio 7 is explored in
+							depth, looking at how Visual Basic, Visual
+							C++, C#, and ASP+ are integrated into a
+							comprehensive development environment.
+						</description>
+					</book>
+				</catalog>
+			</variable>
+		</variables>
+
+
+		<!-- 1. Get total books sold each author -->
+		<!-- Expected Output:
+			<result>
+			<author name="O'Brien, Tim" copiessold="200" />
+			<author name="Galos, Mike" copiessold="100" />
+			<author name="Kress, Peter" copiessold="500" />
+			</result>
+		-->
+		<!-- Syntax to achieve output:-->
+		<group outputvariable="groupedResult"
+			by="$catalog//book/author">
+			<authors>
+				<author name="{$group_key}"/>
+				<totalbookssold>{sum(copiessold)}</totalbookssold>	
+			</authors>
+		</group>
+
+		<display message="Result 1 is" variable="groupedResult" />
+
+
+		<!-- 2. Get total books sold in collector genre HAVING the books price>5 -->
+		<!-- Expected Output:
+			<output>
+			<genre name="Romance" copiessold="23000" />
+			<genre name="Fantasy" copiessold="3000" />
+			<genre name="Computer" copiessold="4000" />
+			</output>
+		-->
+		<!-- Syntax to achieve output:-->
+		<group outputvariable="groupedResult" by="$catalog//book/genre"
+			having="price > 5">
+			<genre name="{$group_key}" copiessold="{sum(copiessold)}" />
+		</group>
+
+		<display message="Result 2 is" variable="groupedResult" />
+
+		<!-- 3. Get total books sold in collector genre by author-->
+		<!-- Expected Output:
+			<output>
+			<genre name="Romance" copiessold="">
+			<author name="" copiessold="" />
+			<author name="" copiessold="" />
+			</genre>
+			<genre name="Fantasy" copiessold="">
+			<author name="" copiessold="" />
+			<author name="" copiessold="" />
+			</genre>
+			<genre name="Computer" copiessold="">
+			<author name="" copiessold="" />
+			<author name="" copiessold="" />
+			</genre>
+			</output>
+		-->
+		<!-- Syntax to achieve output:-->
+		<group outputvariable="groupedResult"
+			by="$catalog//book/genre">
+			<genres>
+				<genre name="{$group_key}"
+					copiessold="{sum(copiessold)}">
+					<group by="author">
+						<authors>
+							<author name="{$group_key}"
+								copiessold="{sum(copiessold)}">
+								<group by="normalize-space(title)">
+									<title name="{$group_key}"
+										copiessold="{sum(copiessold)}" />
+								</group>
+							</author>
+						</authors>
+					</group>
+				</genre>
+			</genres>
+		</group>
+
+		<display message="Result 3 is" variable="groupedResult" />
+
+
+</mashup>

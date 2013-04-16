@@ -1,0 +1,145 @@
+<!-- This work is licensed under a Creative Commons Attribution-Share Alike 3.0 United States License. 
+	 See http://creativecommons.org/licenses/by-sa/3.0/us for the full text. -->
+
+
+<mashup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	        xsi:schemaLocation="http://www.openmashup.org/schemas/v1.0/EMML/../schemas/EMMLSpec.xsd"
+			xmlns:macro="http://www.openmashup.org/schemas/v1.0/EMMLMacro"
+			xmlns="http://www.openmashup.org/schemas/v1.0/EMML" 
+	name="ParallelSelect">
+
+    	<emml-meta name="author">Mythri(mythri@jackbe.com)</emml-meta>
+		<variables>
+			<variable name="result" type="document" >
+				<xml>
+					<stocknews_item>
+						<ticker>13</ticker>
+						<title>Taxing solutions</title>
+						<url>http://www.business-standard.com/india/news/taxing-solutions/352594/</url>
+						<newssource>Business Standard</newssource>
+						<sourcedate>15 hours ago</sourcedate>
+						<source>Google Finance</source>
+					</stocknews_item>
+					<stocknews_item>
+						<ticker>13</ticker>
+						<title>Big challenge for Hong Kong's 'Superman'</title>
+						<url>http://www.marketwatch.com/news/story/hong-kongs-superman-faces-telecom/story.aspx?guid=%7B353471A3-F135-4C21-9CB4-1E034B7D9EDA%7D&amp;dist=msr_1</url>
+						<newssource>MarketWatch</newssource>
+						<sourcedate>17 hours ago</sourcedate>
+						<source>Google Finance</source>
+					</stocknews_item>
+					<stocknews_item>
+						<ticker>13</ticker>
+						<title>Ecuador Govt To Decide Fate Of Manta Port In Three Months</title>
+						<url>http://online.wsj.com/article/BT-CO-20090319-716927.html?mod=</url>
+						<newssource>Wall Street Journal</newssource>
+						<sourcedate>Mar 19, 2009</sourcedate>
+						<source>Google Finance</source>
+					</stocknews_item>
+					<stocknews_item>
+						<ticker>13</ticker>
+						<title>European market Update: Risk barometers rise</title>
+						<url>http://www.fxtraders.eu/article.php?id=17936</url>
+						<newssource>Fxtraders.eu</newssource>
+						<sourcedate>Mar 16, 2009</sourcedate>
+						<source>Google Finance</source>
+					</stocknews_item>
+				</xml>
+			</variable>
+			<variable name="join1" type="document"/>
+			<variable name="join2" type="document"/>
+			<variable name="finalOutput" type="document" />
+			<variable name="select1" type="document" />
+			<variable name="select2" type="document" />
+			<variable name="select3" type="document" />
+			<variable name="select4" type="document" />
+		</variables>
+		<output name="res" type="document" />
+		<parallel>
+			<sequence>
+				<select inputvariable="result" outputvariable="select1"
+					selectexpr="/xml/stocknews_item">
+					<columns>
+						<column>ticker</column>
+						<column>title</column>
+					</columns>
+				</select>
+			</sequence>
+			<sequence>
+				<select inputvariable="result" outputvariable="select2"
+					selectexpr="/xml/stocknews_item">
+					<columns>
+						<column>ticker</column>
+						<column>url</column>
+					</columns>
+				</select>
+			</sequence>
+		</parallel>
+
+
+
+		<parallel>
+			<sequence>
+				<select inputvariable="result" outputvariable="select3"
+					selectexpr="/xml/stocknews_item">
+					<columns>
+						<column>url</column>
+						<column>newssource</column>
+					</columns>
+				</select>
+			</sequence>
+			<sequence>
+				<select inputvariable="result" outputvariable="select4"
+					selectexpr="/xml/stocknews_item">
+					<columns>
+						<column>newssource</column>
+						<column>sourcedate</column>
+					</columns>
+				</select>
+			</sequence>
+		</parallel>
+
+
+		<parallel>
+			<sequence>
+				<join
+					joincondition="$select1/xml/stocknews_item/distinct-values(ticker)=$select2/xml/stocknews_item/distinct-values(ticker)"
+					outputvariable="join1">
+					<select name="join1">
+						<joinResult>
+							<url>{$select2/string(url)}</url>
+							<ticker>{$select1/string(ticker)}</ticker>
+							<title>{$select1/string(title)}</title>
+						</joinResult>
+					</select>
+				</join>
+			</sequence>
+			<sequence>
+				<join
+					joincondition="$select3/xml/stocknews_item/distinct-values(newssource)=$select4/xml/stocknews_item/distinct-values(newssource)"
+					outputvariable="join2">
+					<select name="join2">
+						<joinResult>
+							<url>{$select3/string(url)}</url>
+							<newssource>{$select3/string(newssource)}</newssource>
+							<sourcedate>{$select4/string(sourcedate)}</sourcedate>
+						</joinResult>
+					</select>
+				</join>
+			</sequence>
+		</parallel>
+
+		<join joincondition="$join1/join1/joinResult/url=$join2/join2/joinResult/url"
+			outputvariable="finalOutput">
+			<select name="finalOutput">
+				<item>
+					<url>{$join1//string(url)}</url>
+					<sourcedate>{$join2//string(sourcedate)}</sourcedate>
+					<ticker>{$join1//string(ticker)}</ticker>
+					<newssource>{$join2//string(newssource)}</newssource>
+					<title>{$join1//string(title)}</title>
+				</item>
+			</select>
+		</join>
+		<assign fromvariable="finalOutput" outputvariable="res"/>
+</mashup>

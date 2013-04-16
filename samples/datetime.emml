@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- This work is licensed under a Creative Commons Attribution-Share Alike 3.0 United States License. 
+	 See http://creativecommons.org/licenses/by-sa/3.0/us for the full text. -->
+
+<mashup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.openmashup.org/schemas/v1.0/EMML/../schemas/EMMLSpec.xsd"
+        xmlns="http://www.openmashup.org/schemas/v1.0/EMML"
+		xmlns:emmlfn="java:org.oma.emml.utils.EMMLFunctions"
+	    name="DateTimeOperations">
+
+    	<emml-meta name="author">Raj Krishnamurthy(raj@jackbe.com)</emml-meta>
+
+		<output name="result" type="document"/>
+
+		<input name="inputdate" type="datetime" default="1999-12-31 12:00:00"/>
+
+		<variable name="dt1" type="datetime"/>
+		<variable name="dt2" type="datetime"/>
+
+
+		<!-- initialize dt1 -->
+		<assign fromexpr="current-dateTime()" outputvariable="dt1"/>
+
+		<display message="start datetime dt1: " expr="$dt1"/>
+		<appendresult outputvariable="result">
+			<starttime>{$dt1}</starttime>
+		</appendresult>
+
+
+    <script type="text/javascript" inputvariables="" outputvariable="">
+    <![CDATA[
+		// relax for 5 seconds
+		Packages.java.lang.Thread.currentThread().sleep(5000);
+    ]]>
+    </script>
+
+
+		<!-- initialize dt2 -->
+		<assign fromexpr="current-dateTime()" outputvariable="dt2"/>
+		<display message="end datetime dt2: " expr="$dt2"/>
+		<appendresult outputvariable="result">
+			<endtime>{$dt2}</endtime>
+		</appendresult>
+
+		<!-- xpath date operations involving dt1, dt2 -->
+		<appendresult outputvariable="result">
+			<metrics>
+				<duration>{$dt2 - $dt1}</duration>
+				<durationSeconds>{seconds-from-duration($dt2 - $dt1)}</durationSeconds>
+				<year>{year-from-dateTime($dt2)}</year>
+				<month>{month-from-dateTime($dt2)}</month>
+				<day>{day-from-dateTime($dt2)}</day>
+				<hours>{hours-from-dateTime($dt2)}</hours>
+				<minutes>{minutes-from-dateTime($dt2)}</minutes>
+				<seconds>{seconds-from-dateTime($dt2)}</seconds>
+			</metrics>
+		</appendresult>
+
+
+		<display message="time duration dt2-dt1= " expr="$dt2 - $dt1"/>
+		<display message="duration seconds = " expr="seconds-from-duration($dt2 - $dt1)"/>
+		<display message="year= " expr="year-from-dateTime($dt2)"/>
+		<display message="month= " expr="month-from-dateTime($dt2)"/>
+		<display message="day= " expr="day-from-dateTime($dt2)"/>
+		<display message="hours= " expr="hours-from-dateTime($dt2)"/>
+		<display message="minutes= " expr="minutes-from-dateTime($dt2)"/>
+		<display message="seconds= " expr="seconds-from-dateTime($dt2)"/>
+</mashup>
