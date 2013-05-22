@@ -1,0 +1,1110 @@
+<macros xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.openmashup.org/schemas/v1.0/EMML/../schemas/EMMLPrestoSpec.xsd"
+    xmlns="http://www.openmashup.org/schemas/v1.0/EMML" 
+    xmlns:presto="http://www.jackbe.com/v1.0/EMMLPrestoExtensions"
+    xmlns:macro="http://www.openmashup.org/schemas/v1.0/EMMLMacro"
+    xmlns:fn="java:org.oma.emml.utils.EMMLFunctions" 
+    domain="Salesforce">
+
+<macro name="Login" xmlns="http://www.openmashup.org/schemas/v1.0/EMML" 
+    xmlns:presto="http://www.jackbe.com/v1.0/EMMLPrestoExtensions" 
+    xmlns:urn="urn:enterprise.soap.sforce.com" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    domain="Salesforce">
+
+    <emml-meta name="author">deepak.alur@jackbe.com</emml-meta>
+    <emml-meta name="author">rajmohan.krishnamurthy@jackbe.com</emml-meta>
+
+    <presto:presto-meta name="macrotype">user</presto:presto-meta> 
+    <presto:presto-meta name="icon">salesforce.gif</presto:presto-meta> 
+    <presto:presto-meta name="help"> 
+        <description>Use Salesforce Login block with your Salesforce username and password (with API token). 
+        Requires a Salesforce WSDL web service registered with the id of 'Salesforce'.
+        </description> 
+        <parameters> 
+            <parameter name="username">Salesforce login username</parameter> 
+            <parameter name="password">Salesforce password with token appended</parameter> 
+        </parameters> 
+    </presto:presto-meta>
+
+    <variable name="user.salesforceusername" type="string" default="" />
+    <variable name="user.salesforcepassword" type="string" default="" />
+
+    <output name="LoginResponse" type="document"/>
+
+    <!-- Build Salesforce login service request -->
+    <constructor outputvariable="loginrequest">
+          <urn:login>
+             <urn:username>{$user.salesforceusername}</urn:username>
+             <urn:password>{$user.salesforcepassword}</urn:password>
+          </urn:login>
+    </constructor>
+
+    <!-- Invoke Salesforce Login operation -->
+    <invoke service="Salesforce" 
+        operation="login" 
+        inputvariables="loginrequest" 
+        outputvariable="LoginResponse"/>
+
+</macro>
+
+<macro name="Query" xmlns="http://www.openmashup.org/schemas/v1.0/EMML" 
+    xmlns:presto="http://www.jackbe.com/v1.0/EMMLPrestoExtensions" 
+    xmlns:urn="urn:enterprise.soap.sforce.com" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    domain="Salesforce">
+
+    <emml-meta name="author">deepak.alur@jackbe.com</emml-meta>
+    <emml-meta name="author">rajmohan.krishnamurthy@jackbe.com</emml-meta>
+
+    <presto:presto-meta name="macrotype">user</presto:presto-meta> 
+    <presto:presto-meta name="icon">salesforce.gif</presto:presto-meta> 
+    <presto:presto-meta name="help"> 
+        <description>Salesforce Query runs a valid Salesforce SOQL query and retrieves matching records. Please refer to Salesforce documentation for SOQL.
+        Requires that you have already registered the Salesforce WSDL web service with the id of 'Salesforce'.
+        </description> 
+        <parameters> 
+            <parameter name="LoginResponse">Result returned by a Salesforce login operation</parameter> 
+            <parameter name="SOQLQuery">A valid Salesforce query statement. Please see Salesforce documentation for SOQL.</parameter> 
+        </parameters> 
+    </presto:presto-meta>
+
+    <input name="LoginResponse" type="document" label="Salesforce Login Response"/>
+    <input name="SOQLQuery" type="string" label="Salesforce Query"
+           default=""/>
+    <output name="queryresult" type="document"/>
+
+    <!-- Build Request Header to invoke the Salesforce service
+            - using sessionId data returned from Login operation response
+                    i.e. {$LoginResponse//urn:sessionId/string()}
+            - using dynamic endpoint returned from Login operation response
+                    i.e. {$LoginResponse//urn:serverUrl/string()}
+    -->
+    <constructor outputvariable="requestheader">
+        <header>
+            <serviceEndpoint>{$LoginResponse//urn:serverUrl/string()}</serviceEndpoint>
+            <serviceHeader>
+                  <urn:SessionHeader>
+                     <urn:sessionId>{$LoginResponse//urn:sessionId/string()}</urn:sessionId>
+                  </urn:SessionHeader>
+            </serviceHeader>
+        </header>
+    </constructor>
+ 
+    <!-- Build Request payload for SalesForce query operation -->
+    <constructor outputvariable="accountrequest">
+          <urn:query>
+             <urn:queryString>{$SOQLQuery}</urn:queryString>
+          </urn:query>
+    </constructor>
+ 
+    <!-- Invoke SalesForce query operation using the newly constructed request & header payloads  -->
+    <invoke service="Salesforce" operation="query"
+            inputvariables="accountrequest" 
+            outputvariable="queryresult" 
+            header="requestheader"/>
+
+</macro>
+
+<macro name="Account" xmlns="http://www.openmashup.org/schemas/v1.0/EMML" 
+    xmlns:presto="http://www.jackbe.com/v1.0/EMMLPrestoExtensions" 
+    xmlns:urn="urn:enterprise.soap.sforce.com" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    domain="Salesforce">
+
+    <emml-meta name="author">deepak.alur@jackbe.com</emml-meta>
+    <emml-meta name="author">rajmohan.krishnamurthy@jackbe.com</emml-meta>
+
+    <presto:presto-meta name="macrotype">user</presto:presto-meta> 
+    <presto:presto-meta name="icon">salesforce.gif</presto:presto-meta> 
+    <presto:presto-meta name="help"> 
+        <description>Salesforce Account block retrieves matching Account records for a given Account Number. 
+        If Account Number is not provided, retrieves all Account records. 
+        Requires that you have already registered the Salesforce WSDL web service with the id of 'Salesforce'.
+        </description> 
+        <parameters> 
+            <parameter name="AccountNumber">A specific Account Number to search Account.</parameter> 
+            <parameter name="AccountName">An Account Name to find matching Account.</parameter>
+            <parameter name="MinimumRevenue">Accounts with revenue more than this limit.</parameter>
+            <parameter name="MaximumRevenue">Accounts with revenue not exceeding this limit.</parameter>
+            <parameter name="TickerSymbol">Accounts with this Ticker Symbol</parameter>
+            <parameter name="Fields">A comma separated list of valid field names for Account. See Salesforce documentation.</parameter> 
+            <parameter name="LoginResponse">Response from a valid Salesforce login</parameter> 
+        </parameters> 
+    </presto:presto-meta>
+
+    <input name="AccountNumber" type="string" label="Account Number"/>
+    
+    <input name="AccountName" type="string" label="Account Name"/>
+    
+    <input name="MinimumRevenue" type="number" label="Minimum Revenue"/>
+    
+    <input name="MaximumRevenue" type="number" label="Minimum Revenue"/>
+    
+    <input name="TickerSymbol" type="string" label="Ticker Symbol"/>
+    
+    <input name="Fields" type="string" label="Comma separated list of Account Fields, leave blank for basic"/>
+
+    <input name="LoginResponse" type="document" label="Salesforce Login Response"/>
+
+    <output name="accountresult" type="document"/>
+
+    <variables>
+    <variable name="allfields" type="string" 
+          default="Id, AccountNumber, AnnualRevenue, BillingCity, BillingCountry, BillingPostalCode, BillingState, BillingStreet, CreatedById, CreatedDate, Description, Fax, Industry, IsDeleted, LastActivityDate, LastModifiedById, LastModifiedDate, MasterRecordId, Name, NumberOfEmployees, OwnerId, Ownership, ParentId, Phone, Rating, ShippingCity, ShippingCountry, ShippingPostalCode, ShippingState, ShippingStreet, Sic, Site, SystemModstamp, TickerSymbol, Type, Website"/>
+    <variable name="basicfields" type="string" default="Id, Name, AccountNumber, AnnualRevenue, Description, TickerSymbol, Type, Website"/>
+    <variable name="queryfields" type='string'/>
+    <variable name="dynamicquery" type='string'/>
+    </variables>
+
+    <assign fromvariable="basicfields" outputvariable="queryfields" mode="replace"/>
+
+    <script type="text/javascript" inputvariables="Fields, basicfields, allfields, AccountNumber, AccountName, MinimumRevenue, MaximumRevenue, TickerSymbol" outputvariable="dynamicquery">
+    <![CDATA[
+        var selectclause = "Select " ;
+        if (Fields == 'all')
+            selectclause += allfields;
+        else if (Fields == 'basic')
+            selectclause += basicfields;
+        else if (Fields != '')
+            selectclause += Fields;
+        else 
+            selectclause += basicfields;
+ 
+        selectclause += ' from Account';
+ 
+        var whereclause = " where ";
+        var andrequired = false;
+        if ( AccountNumber != '' ) {
+            whereclause += " AccountNumber like '%" + AccountNumber + "%'";
+            andrequired = true;
+        }
+ 
+        if ( AccountName != '' ) {
+            if (andrequired) whereclause += " and ";
+            whereclause += " Name like '%" + AccountName + "%'";
+            andrequired = true;
+        }
+ 
+        if ( MinimumRevenue != '' ) {
+            if (andrequired) whereclause += " and ";
+            whereclause += " AnnualRevenue >= " + MinimumRevenue ;
+            andrequired = true;
+        }
+
+        if ( MaximumRevenue != '' ) {
+            if (andrequired) whereclause += " and ";
+            whereclause += " AnnualRevenue <= " + MaximumRevenue ;
+            andrequired = true;
+        }
+ 
+        if ( TickerSymbol != '' ) {
+            if (andrequired) whereclause += " and ";
+            whereclause += " TickerSymbol like '%" + TickerSymbol + "%'";
+            andrequired = true;
+        }
+ 
+        if (andrequired) {
+            dynamicquery = selectclause + whereclause;
+        } else {
+            dynamicquery = selectclause;
+        }
+    ]]>
+    </script>
+
+    <!-- Build Request Header to invoke the Salesforce service
+            - using sessionId data returned from Login operation response
+                    i.e. {$LoginResponse//urn:sessionId/string()}
+            - using dynamic endpoint returned from Login operation response
+                    i.e. {$LoginResponse//urn:serverUrl/string()}
+    -->
+    <constructor outputvariable="requestheader">
+        <header>
+            <serviceEndpoint>{$LoginResponse//urn:serverUrl/string()}</serviceEndpoint>
+            <serviceHeader>
+                  <urn:SessionHeader>
+                     <urn:sessionId>{$LoginResponse//urn:sessionId/string()}</urn:sessionId>
+                  </urn:SessionHeader>
+            </serviceHeader>
+        </header>
+    </constructor>
+ 
+    <!-- Build Request payload for SalesForce query operation -->
+    <constructor outputvariable="accountrequest">
+          <urn:query>
+             <urn:queryString>{$dynamicquery}</urn:queryString>
+          </urn:query>
+    </constructor>
+ 
+    <!-- Invoke SalesForce query operation using the newly constructed request & header payloads  -->
+    <invoke service="Salesforce" operation="query"
+            inputvariables="accountrequest" outputvariable="accountresult" header="requestheader"/>
+
+</macro>
+
+<macro name="Case" xmlns="http://www.openmashup.org/schemas/v1.0/EMML" 
+    xmlns:presto="http://www.jackbe.com/v1.0/EMMLPrestoExtensions" 
+    xmlns:urn="urn:enterprise.soap.sforce.com" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    domain="Salesforce">
+
+    <emml-meta name="author">deepak.alur@jackbe.com</emml-meta>
+    <emml-meta name="author">rajmohan.krishnamurthy@jackbe.com</emml-meta>
+
+    <presto:presto-meta name="macrotype">user</presto:presto-meta> 
+    <presto:presto-meta name="icon">salesforce.gif</presto:presto-meta> 
+    <presto:presto-meta name="help"> 
+        <description>Salesforce Case block retrieves matching Case records for a given Account ID. 
+        If Account ID is not provided, retrieves all Case records. 
+        Requires that you have already registered the Salesforce WSDL web service with the id of 'Salesforce'.
+        </description> 
+        <parameters> 
+            <parameter name="AccountId">A specific Account Id to search Case.</parameter> 
+            <parameter name="CaseNumber">An Case Number to find matching Case.</parameter>
+            <parameter name="Priority">A priority to find the matching Case.</parameter>
+            <parameter name="Status">A status to find the matching Case.</parameter>
+            <parameter name="Subject">A subject to find matching Case.</parameter>
+            <parameter name="Fields">A comma separated list of valid field names for Case. See Salesforce documentation.</parameter> 
+            <parameter name="LoginResponse">Response from a valid Salesforce login</parameter> 
+        </parameters> 
+    </presto:presto-meta>
+
+    <input name="AccountId" type="string" label="Account Id"/>
+
+    <input name="CaseNumber" type="string" label="Case Number"/>
+
+    <input name="Priority" type="string" label="Priority"/>
+
+    <input name="Status" type="string" label="Status"/>
+
+    <input name="Subject" type="string" label="Subject"/>
+
+    <input name="Fields" type="string" label="Comma separated list of Case Fields"/>
+
+    <input name="LoginResponse" type="document" label="Salesforce Login Response"/>
+
+    <output name="caseresult" type="document"/>
+
+    <variables>
+        <variable name="allfields" type="string" 
+            default="Id, AccountId, AssetId, CaseNumber, ClosedDate, ContactId, CreatedById, CreatedDate, Description, HasCommentsUnreadByOwner, HasSelfServiceComments, IsClosed, IsDeleted, IsEscalated, LastModifiedById, LastModifiedDate, Origin, OwnerId, Priority, Reason, Status, Subject, SuppliedCompany, SuppliedEmail, SuppliedName, SuppliedPhone, SystemModstamp, Type"/>
+ 
+        <variable name="basicfields" type="string" default="Id, AccountId, CaseNumber, Description, Subject, Priority, Status"/>
+        <variable name="queryfields" type='string'/>
+        <variable name="dynamicquery" type='string'/>
+    </variables>
+
+    <script type="text/javascript" inputvariables="Fields, basicfields, allfields, AccountId, CaseNumber, Priority, Status, Subject" outputvariable="dynamicquery">
+    <![CDATA[
+        var selectclause = "Select " ;
+        if (Fields == 'all')
+            selectclause += allfields;
+        else if (Fields == 'basic')
+            selectclause += basicfields;
+        else if (Fields != '')
+            selectclause += Fields;
+        else 
+            selectclause += basicfields;
+ 
+        selectclause += ' from Case';
+ 
+        var whereclause = " where ";
+        var andrequired = false;
+        if ( AccountId != '' ) {
+            whereclause += " AccountId = '" + AccountId + "'";
+            andrequired = true;
+        }
+ 
+        if ( CaseNumber != '' ) {
+            if (andrequired) whereclause += " and ";
+            whereclause += " CaseNumber like '%" + CaseNumber + "%'";
+            andrequired = true;
+        }
+ 
+        if ( Priority != '' ) {
+            if (andrequired) whereclause += " and ";
+            whereclause += " Priority like '%" + Priority + "%'";
+            andrequired = true;
+        }
+
+        if ( Status != '' ) {
+            if (andrequired) whereclause += " and ";
+            whereclause += " Status like '%" + Status + "%'";
+            andrequired = true;
+        }
+ 
+        if ( Subject != '' ) {
+            if (andrequired) whereclause += " and ";
+            whereclause += " Subject like '%" + Subject + "%'";
+            andrequired = true;
+        }
+ 
+        if (andrequired) {
+            dynamicquery = selectclause + whereclause;
+        } else {
+            dynamicquery = selectclause;
+        }
+    ]]>
+    </script>
+
+    <constructor outputvariable="requestheader">
+        <header>
+            <serviceEndpoint>{$LoginResponse//urn:serverUrl/string()}</serviceEndpoint>
+            <serviceHeader>
+                  <urn:SessionHeader>
+                     <urn:sessionId>{$LoginResponse//urn:sessionId/string()}</urn:sessionId>
+                  </urn:SessionHeader>
+            </serviceHeader>
+        </header>
+    </constructor>
+ 
+    <!-- Build Request payload for SalesForce query operation -->
+    <constructor outputvariable="accountrequest">
+          <urn:query>
+             <urn:queryString>{$dynamicquery}</urn:queryString>
+          </urn:query>
+    </constructor>
+ 
+    <!-- Invoke SalesForce query operation using the newly constructed request & header payloads  -->
+    <invoke service="Salesforce" operation="query"
+            inputvariables="accountrequest" outputvariable="caseresult" header="requestheader"/>
+
+</macro>    
+<macro name="Contact" xmlns="http://www.openmashup.org/schemas/v1.0/EMML" 
+    xmlns:presto="http://www.jackbe.com/v1.0/EMMLPrestoExtensions" 
+    xmlns:urn="urn:enterprise.soap.sforce.com" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    domain="Salesforce">
+
+    <emml-meta name="author">deepak.alur@jackbe.com</emml-meta>
+    <emml-meta name="author">rajmohan.krishnamurthy@jackbe.com</emml-meta>
+
+    <presto:presto-meta name="macrotype">user</presto:presto-meta> 
+    <presto:presto-meta name="icon">salesforce.gif</presto:presto-meta> 
+    <presto:presto-meta name="help"> 
+        <description>Salesforce Contact block retrieves matching Contact records for a given Account ID. If Account ID is not provided, retrieves all Contact records.
+        Requires that you have already registered the Salesforce WSDL web service with the id of 'Salesforce'.
+        </description> 
+        <parameters> 
+            <parameter name="AccountId">A specific Account ID to search Contacts. If Account ID is not provided, retrieves all Contacts.</parameter> 
+            <parameter name="Name">A name to search for matching Contacts.</parameter>
+            <parameter name="Email">An email address to search for matching Contacts.</parameter> 
+            <parameter name="Fields">A comma separated list of valid field names for Contact. See Salesforce documentation.</parameter> 
+            <parameter name="LoginResponse">Response from a valid Salesforce login</parameter> 
+        </parameters> 
+    </presto:presto-meta>
+
+    <input name="AccountId" type="string" label="Account Id"/>
+
+    <input name="Name" type="string" label="Name"/>
+
+    <input name="Email" type="string"  label="Email"/>
+
+    <!--input name="FirstName" type="string"/-->
+
+    <!--input name="LastName" type="string"/-->
+
+    <input name="Fields" type="string"  label="Comma separated list of Contact Fields"/>
+
+    <input name="LoginResponse" type="document" label="Salesforce Login Response"/>
+
+    <output name="contactresult" type="document"/>
+
+    <variables>
+         <variable name="allFields" type="string" 
+              default="Id, AccountId, AssistantName, AssistantPhone, Birthdate, CreatedById, CreatedDate, Department, Description, Email, Fax, FirstName, HomePhone, IsDeleted, LastActivityDate, LastCURequestDate, LastCUUpdateDate, LastModifiedById, LastModifiedDate, LastName, LeadSource, MailingCity, MailingCountry, MailingPostalCode, MailingState, MailingStreet, MasterRecordId, MobilePhone, Name, OtherCity, OtherCountry, OtherPhone, OtherPostalCode, OtherState, OtherStreet, OwnerId, Phone, ReportsToId, Salutation, SystemModstamp, Title"/>
+         <variable name="basicFields" type="string" default="Id, AccountId, Name, Email, Department, Phone, MobilePhone"/>
+         <variable name="queryFields" type='string'/>
+        <variable name="dynamicquery" type='string'/>
+    </variables>
+
+    <script type="text/javascript" inputvariables="Fields, basicFields, allFields, AccountId, Name, Email" outputvariable="dynamicquery">
+    <![CDATA[
+        var selectclause = "Select " ;
+        if (Fields == 'all')
+            selectclause += allFields;
+        else if (Fields == 'basic')
+            selectclause += basicFields;
+        else if (Fields != '')
+            selectclause += Fields;
+        else 
+            selectclause += basicFields;
+ 
+        selectclause += ' from Contact';
+ 
+        var whereclause = " where ";
+        var andrequired = false;
+        if ( AccountId != '' ) {
+            whereclause += " AccountId = '" + AccountId + "'";
+            andrequired = true;
+        }
+ 
+        if ( Name != '' ) {
+            if (andrequired) whereclause += " and ";
+            whereclause += " Name like '%" + Name + "%'";
+            andrequired = true;
+        }
+
+        if ( Email != '' ) {
+            if (andrequired) whereclause += " and ";
+            whereclause += " Email like '%" + Email + "%'";
+            andrequired = true;
+        }
+ 
+        /* if ( FirstName != '' ) {
+            if (andrequired) whereclause += " and ";
+            whereclause += " FirstName like '%" + FirstName + "%'";
+            andrequired = true;
+        }
+
+        if ( LastName != '' ) {
+            if (andrequired) whereclause += " and ";
+            whereclause += " LastName like '%" + LastName + "%'";
+            andrequired = true;
+        }*/
+ 
+        if (andrequired) {
+            dynamicquery = selectclause + whereclause;
+        } else {
+            dynamicquery = selectclause;
+        }
+    ]]>
+    </script>
+
+
+    <!-- Build Request Header to invoke the Salesforce service
+            - using sessionId data returned from Login operation response
+                    i.e. {$LoginResponse//urn:sessionId/string()}
+            - using dynamic endpoint returned from Login operation response
+                    i.e. {$LoginResponse//urn:serverUrl/string()}
+    -->
+    <constructor outputvariable="requestheader">
+        <header>
+            <serviceEndpoint>{$LoginResponse//urn:serverUrl/string()}</serviceEndpoint>
+            <serviceHeader>
+                  <urn:SessionHeader>
+                     <urn:sessionId>{$LoginResponse//urn:sessionId/string()}</urn:sessionId>
+                  </urn:SessionHeader>
+            </serviceHeader>
+        </header>
+    </constructor>
+ 
+    <!-- Build Request payload for SalesForce query operation -->
+    <constructor outputvariable="accountrequest">
+          <urn:query>
+             <urn:queryString>{$dynamicquery}</urn:queryString>
+          </urn:query>
+    </constructor>
+ 
+    <!-- Invoke SalesForce query operation using the newly constructed request & header payloads  -->
+    <invoke service="Salesforce" operation="query"
+            inputvariables="accountrequest" outputvariable="contactresult" header="requestheader"/>
+
+</macro>
+
+<macro name="Contract" xmlns="http://www.openmashup.org/schemas/v1.0/EMML" 
+    xmlns:presto="http://www.jackbe.com/v1.0/EMMLPrestoExtensions" 
+    xmlns:urn="urn:enterprise.soap.sforce.com" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    domain="Salesforce">
+
+    <emml-meta name="author">deepak.alur@jackbe.com</emml-meta>
+    <emml-meta name="author">rajmohan.krishnamurthy@jackbe.com</emml-meta>
+
+    <presto:presto-meta name="macrotype">user</presto:presto-meta> 
+    <presto:presto-meta name="icon">salesforce.gif</presto:presto-meta> 
+    <presto:presto-meta name="help"> 
+        <description>Salesforce Contract block retrieves matching Contract records for a given Account ID. If Account ID is not provided, retrieves all Contract records. 
+        Requires that you have already registered the Salesforce WSDL web service with the id of 'Salesforce'.
+        </description> 
+        <parameters> 
+            <parameter name="AccountId">A specific Account Id to search Contracts. If Account Id is not provided, retrieves all Contracts.</parameter> 
+            <parameter name="ContractNumber">A specific Contract Number to search Contracts. If Contract Number is not provided, retrieves all Contracts.</parameter> 
+            <parameter name="Fields">A comma separated list of valid field names for Contract. See Salesforce documentation.</parameter> 
+            <parameter name="LoginResponse">Response from a valid Salesforce login</parameter> 
+        </parameters> 
+    </presto:presto-meta>
+
+    <input name="AccountId" type="string"  label="Account Id"/>
+    
+    <input name="ContractNumber" type="string"  label="Contract Number"/>
+    
+    <input name="Fields" type="string"  label="Comma separated list of Contract Fields"/>
+
+    <input name="LoginResponse" type="document" label="Salesforce Login Response"/>
+
+    <output name="contractresult" type="document"/>
+
+    <variables>
+    <variable name="allFields" type="string" 
+          default="Id, AccountId, ActivatedById, ActivatedDate, BillingCity, BillingCountry, BillingPostalCode, BillingState, BillingStreet, CompanySignedDate, CompanySignedId, ContractNumber, ContractTerm, CreatedById, CreatedDate, CustomerSignedDate, CustomerSignedId, CustomerSignedTitle, Description, EndDate, IsDeleted, LastActivityDate, LastApprovedDate, LastModifiedById, LastModifiedDate, OwnerExpirationNotice, OwnerId, SpecialTerms, StartDate, Status, StatusCode, SystemModstamp"/>
+    <variable name="basicFields" type="string" default="Id, AccountId, ContractNumber, ContractTerm, Description, StartDate, EndDate, Status"/>
+    <variable name="queryFields" type='string'/>
+    <variable name="dynamicquery" type='string'/>
+    </variables>
+
+
+    <script type="text/javascript" inputvariables="Fields, basicFields, allFields, AccountId, ContractNumber" outputvariable="dynamicquery">
+    <![CDATA[
+        var selectclause = "Select " ;
+        if (Fields == 'all')
+            selectclause += allFields;
+        else if (Fields == 'basic')
+            selectclause += basicFields;
+        else if (Fields != '')
+            selectclause += Fields;
+        else 
+            selectclause += basicFields;
+ 
+        selectclause += ' from Contract';
+ 
+        var whereclause = " where ";
+        var andrequired = false;
+        if ( AccountId != '' ) {
+            whereclause += " AccountId = '" + AccountId + "'";
+            andrequired = true;
+        }
+ 
+        if ( ContractNumber != '' ) {
+            if (andrequired) whereclause += " and ";
+            whereclause += " ContractNumber like '%" + ContractNumber + "%'";
+            andrequired = true;
+        }
+
+        if (andrequired) {
+            dynamicquery = selectclause + whereclause;
+        } else {
+            dynamicquery = selectclause;
+        }
+
+ 
+    ]]>
+    </script>
+
+
+    <!-- Build Request Header to invoke the Salesforce service
+            - using sessionId data returned from Login operation response
+                    i.e. {$LoginResponse//urn:sessionId/string()}
+            - using dynamic endpoint returned from Login operation response
+                    i.e. {$LoginResponse//urn:serverUrl/string()}
+    -->
+    <constructor outputvariable="requestheader">
+        <header>
+            <serviceEndpoint>{$LoginResponse//urn:serverUrl/string()}</serviceEndpoint>
+            <serviceHeader>
+                  <urn:SessionHeader>
+                     <urn:sessionId>{$LoginResponse//urn:sessionId/string()}</urn:sessionId>
+                  </urn:SessionHeader>
+            </serviceHeader>
+        </header>
+    </constructor>
+ 
+    <!-- Build Request payload for SalesForce query operation -->
+    <constructor outputvariable="accountrequest">
+          <urn:query>
+             <urn:queryString>{$dynamicquery}</urn:queryString>
+          </urn:query>
+    </constructor>
+ 
+    <!-- Invoke SalesForce query operation using the newly constructed request & header payloads  -->
+    <invoke service="Salesforce" operation="query"
+            inputvariables="accountrequest" outputvariable="contractresult" header="requestheader"/>
+
+</macro>
+
+<macro name="Event" xmlns="http://www.openmashup.org/schemas/v1.0/EMML" 
+    xmlns:presto="http://www.jackbe.com/v1.0/EMMLPrestoExtensions" 
+    xmlns:urn="urn:enterprise.soap.sforce.com" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    domain="Salesforce">
+
+    <emml-meta name="author">deepak.alur@jackbe.com</emml-meta>
+    <emml-meta name="author">rajmohan.krishnamurthy@jackbe.com</emml-meta>
+
+    <presto:presto-meta name="macrotype">user</presto:presto-meta> 
+    <presto:presto-meta name="icon">salesforce.gif</presto:presto-meta> 
+    <presto:presto-meta name="help"> 
+        <description>Salesforce Event block retrieves matching Event records for a given Account ID. If Account ID is not provided, retrieves all Event records. 
+        Requires that you have already registered the Salesforce WSDL web service with the id of 'Salesforce'.
+        </description> 
+        <parameters> 
+            <parameter name="AccountId">A specific Account ID name to search Events. If Account Id is not provided, retrieves all Events.</parameter> 
+            <parameter name="Subject">A subject to find matching Case.</parameter>
+            <parameter name="Fields">A comma separated list of valid field names for Event. See Salesforce documentation.</parameter> 
+            <parameter name="LoginResponse">Response from a valid Salesforce login</parameter> 
+        </parameters> 
+    </presto:presto-meta>
+
+    <input name="AccountId" type="string" label="Account Id"/>
+
+    <input name="Subject" type="string" label="Subject"/>
+
+    <input name="Fields" type="string" label="Comma separated list of Event Fields"/>
+
+    <input name="LoginResponse" type="document" label="Salesforce Login Response"/>
+
+    <output name="eventresult" type="document"/>
+
+    <variables>
+        <variable name="allFields" type="string" 
+            default="Id, AccountId, ActivityDate, ActivityDateTime, CreatedById, CreatedDate, Description, DurationInMinutes, IsAllDayEvent, IsArchived, IsChild, IsDeleted, IsGroupEvent, IsPrivate, IsRecurrence, IsReminderSet, LastModifiedById, LastModifiedDate, Location, OwnerId, RecurrenceActivityId, RecurrenceDayOfMonth, RecurrenceDayOfWeekMask, RecurrenceEndDateOnly, RecurrenceInstance, RecurrenceInterval, RecurrenceMonthOfYear, RecurrenceStartDateTime, RecurrenceTimeZoneSidKey, RecurrenceType, ReminderDateTime, ShowAs, Subject, SystemModstamp, WhatId, WhoId"/>
+        <variable name="basicFields" type="string"    default="Id, AccountId, ActivityDate, ActivityDateTime, Description, Subject"/>
+        <variable name="queryFields" type='string'/>
+        <variable name="dynamicquery" type='string'/>
+    </variables>
+
+    <script type="text/javascript" inputvariables="Fields, basicFields, allFields, AccountId, Subject" outputvariable="dynamicquery">
+    <![CDATA[
+        var selectclause = "Select " ;
+        if (Fields == 'all')
+            selectclause += allFields;
+        else if (Fields == 'basic')
+            selectclause += basicFields;
+        else if (Fields != '')
+            selectclause += Fields;
+        else 
+            selectclause += basicFields;
+ 
+        selectclause += ' from Event';
+ 
+        var whereclause = " where ";
+        var andrequired = false;
+        if ( AccountId != '' ) {
+            whereclause += " AccountId = '" + AccountId + "'";
+            andrequired = true;
+        }
+        if ( Subject != '' ) {
+            if (andrequired) whereclause += " and ";
+            whereclause += " Subject like '%" + Subject + "%'";
+            andrequired = true;
+        }
+ 
+        if (andrequired) {
+            dynamicquery = selectclause + whereclause;
+        } else {
+            dynamicquery = selectclause;
+        }
+    ]]>
+    </script>
+
+    <constructor outputvariable="requestheader">
+        <header>
+            <serviceEndpoint>{$LoginResponse//urn:serverUrl/string()}</serviceEndpoint>
+            <serviceHeader>
+                  <urn:SessionHeader>
+                     <urn:sessionId>{$LoginResponse//urn:sessionId/string()}</urn:sessionId>
+                  </urn:SessionHeader>
+            </serviceHeader>
+        </header>
+    </constructor>
+ 
+    <!-- Build Request payload for SalesForce query operation -->
+    <constructor outputvariable="accountrequest">
+          <urn:query>
+             <urn:queryString>{$dynamicquery}</urn:queryString>
+          </urn:query>
+    </constructor>
+ 
+    <!-- Invoke SalesForce query operation using the newly constructed request & header payloads  -->
+    <invoke service="Salesforce" operation="query"
+            inputvariables="accountrequest" outputvariable="eventresult" header="requestheader"/>
+
+</macro>
+
+<macro name="Geocoder" xmlns="http://www.openmashup.org/schemas/v1.0/EMML" 
+    xmlns:presto="http://www.jackbe.com/v1.0/EMMLPrestoExtensions" 
+    xmlns:urn="urn:enterprise.soap.sforce.com" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#"
+    xmlns:sfroot="urn:enterprise.soap.sforce.com"
+    xmlns:sf="urn:sobject.enterprise.soap.sforce.com"
+    xmlns:y="urn:yahoo:maps"
+    domain="Salesforce">
+
+    <emml-meta name="author">deepak.alur@jackbe.com</emml-meta>
+    <emml-meta name="author">rajmohan.krishnamurthy@jackbe.com</emml-meta>
+
+    <presto:presto-meta name="macrotype">user</presto:presto-meta> 
+    <presto:presto-meta name="icon">salesforce.gif</presto:presto-meta> 
+    <presto:presto-meta name="help"> 
+        <description>Use SalesforceGeocoder block to iterate over records and Geo code the location field. 
+        The input records should have Street, City, State, PostalCode and Country fields. 
+        Performs a direct invoke to the Yahoo Geocoding API for each location to be geocoded. 
+        Uses Yahoo API Id defined in User Attributes as' yahooapiid'. 
+        If attribute is not defined, defaults to 'YahooDemo' as the API Id.
+        </description> 
+        <parameters> 
+            <parameter name="SalesforceDocument">A Salesforce results document with Street, City, State, Postal Code and Country to geocode
+            </parameter> 
+        </parameters> 
+    </presto:presto-meta>
+    
+    <input name="SalesforceDocument" type="document" label="Salesforce Document"/>
+
+    <output name="geocodedresult" type="document"/>
+
+    <variables>
+        <variable name="record" type="document"/>
+        <variable name="location" type="string"/>
+    </variables>
+
+    <variable default="YahooDemo" name="user.yahooapiid" type="string"/>
+
+    <!-- Annotate each record in the result with geo-coding information from Yahoo Geocoding Service -->
+    <foreach items="$SalesforceDocument//sfroot:records" variable="record">
+        <assign fromexpr="string-join((  $record/sf:Street, $record/sf:City, $record/sf:State,
+    $record/sf:PostalCode, $record/sf:Country ), ',')" outputvariable="location"/>
+
+        <!-- Get Latitude, Longitude for the given location -->
+        <directinvoke appid="YahooDemo" 
+    endpoint="http://local.yahooapis.com/MapsService/V1/geocode" 
+    location="$location" 
+    output="xml" 
+    outputvariable="georesult"/>
+
+        <annotate expr="." variable="record">
+                element geo:lat { $georesult//y:Latitude/string() },
+                element geo:long { $georesult//y:Longitude/string() }
+        </annotate>
+    </foreach>
+
+    <assign fromvariable="SalesforceDocument" outputvariable="geocodedresult"/>
+
+</macro>
+
+<macro name="Lead" xmlns="http://www.openmashup.org/schemas/v1.0/EMML" 
+    xmlns:presto="http://www.jackbe.com/v1.0/EMMLPrestoExtensions" 
+    xmlns:urn="urn:enterprise.soap.sforce.com" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    domain="Salesforce">
+
+    <emml-meta name="author">deepak.alur@jackbe.com</emml-meta>
+    <emml-meta name="author">rajmohan.krishnamurthy@jackbe.com</emml-meta>
+
+    <presto:presto-meta name="macrotype">user</presto:presto-meta> 
+    <presto:presto-meta name="icon">salesforce.gif</presto:presto-meta> 
+
+    <presto:presto-meta name="help"> 
+        <description>Salesforce Lead block retrieves matching Lead records for a given company and/or city name. If company or city name is not provided, retrieves all Lead records.
+        Requires that you have already registered the Salesforce WSDL web service with the id of 'Salesforce'.
+        </description> 
+
+        <parameters> 
+            <parameter name="Company">A company name to search Leads. If company name is not provided, retrieves all Leads.</parameter> 
+            <parameter name="PersonName">A person name to search Leads. If person name is not provided, retrieves all Leads.</parameter> 
+            <parameter name="City">A city name to search Leads. If city name is not provided, retrieves all Leads.</parameter> 
+            <parameter name="Fields">A comma separated list of valid field names for Lead. See Salesforce documentation.</parameter> 
+            <parameter name="LoginResponse">Response from a valid Salesforce login</parameter> 
+        </parameters> 
+    </presto:presto-meta>
+
+    <input name="Company" type="string" label="Company"/>
+
+    <input name="PersonName" type="string" label="Person Name"/>
+
+    <input name="City" type="string" label="City"/>
+
+    <input name="Fields" type="string" label="Comma separated list of Lead Fields"/>
+
+    <input name="LoginResponse" type="document" label="Salesforce Login Response"/>
+ 
+    <output name="leadresult" type="document"/>
+
+    <variables>
+        <variable name="allFields" type="string"
+            default="Id, AnnualRevenue, City, Company, ConvertedAccountId, ConvertedContactId, ConvertedDate, ConvertedOpportunityId, Country, CreatedById, CreatedDate,  Description, Email, Fax, FirstName, Industry, IsConverted, IsDeleted, IsUnreadByOwner, LastActivityDate, LastModifiedById, LastModifiedDate, LastName, LeadSource, MasterRecordId, MobilePhone, Name, NumberOfEmployees, OwnerId, Phone, PostalCode, Rating, Salutation, State, Status, Street, SystemModstamp, Title, Website"/>
+        
+         <variable name="basicFields" type="string" 
+              default="Id, Name, Email, Phone, Title, Company, Rating, Industry, Status, Description, Street, City, State, Country, PostalCode"/>
+  
+         <variable name="dynamicquery" type="string"/>
+    </variables>
+
+    <script type="text/javascript" inputvariables="Fields, basicFields, allFields, Company, PersonName, City" outputvariable="dynamicquery">
+    <![CDATA[
+        var selectclause = "Select " ;
+        if (Fields == 'all')
+            selectclause += allFields;
+        else if (Fields == 'basic')
+            selectclause += basicFields;
+        else if (Fields != '')
+            selectclause += Fields;
+        else 
+            selectclause += basicFields;
+
+        selectclause += ' from Lead';
+
+        var whereclause = " where ";
+        var andrequired = false;
+        if ( Company != '' ) {
+            whereclause += " Company like '%" + Company + "%'";
+            andrequired = true;
+        }
+        if ( City != '' ) {
+            if (andrequired) whereclause += " and ";
+            andrequired=true;
+            whereclause += " City like '%" + City + "%'";
+        }
+        if ( PersonName != '' ) {
+            if (andrequired) whereclause += " and ";
+            andrequired=true;
+            whereclause += " Name like '%" + PersonName + "%'";
+        }
+
+        if (andrequired) {
+            dynamicquery = selectclause + whereclause;
+        } else {
+            dynamicquery = selectclause;
+        }
+    ]]>
+    </script>
+
+    <constructor outputvariable="requestheader">
+        <header>
+            <serviceEndpoint>{$LoginResponse//urn:serverUrl/string()}</serviceEndpoint>
+            <serviceHeader>
+                  <urn:SessionHeader>
+                     <urn:sessionId>{$LoginResponse//urn:sessionId/string()}</urn:sessionId>
+                  </urn:SessionHeader>
+            </serviceHeader>
+        </header>
+    </constructor>
+ 
+    <!-- Build Request payload for SalesForce query operation -->
+    <constructor outputvariable="accountrequest">
+          <urn:query>
+             <urn:queryString>{$dynamicquery}</urn:queryString>
+          </urn:query>
+    </constructor>
+ 
+    <!-- Invoke SalesForce query operation using the newly constructed request & header payloads  -->
+    <invoke service="Salesforce" operation="query"
+            inputvariables="accountrequest" outputvariable="leadresult" header="requestheader"/>
+
+</macro>
+
+<macro name="Opportunity" xmlns="http://www.openmashup.org/schemas/v1.0/EMML" 
+    xmlns:presto="http://www.jackbe.com/v1.0/EMMLPrestoExtensions" 
+    xmlns:urn="urn:enterprise.soap.sforce.com" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    domain="Salesforce">
+
+    <emml-meta name="author">deepak.alur@jackbe.com</emml-meta>
+    <emml-meta name="author">rajmohan.krishnamurthy@jackbe.com</emml-meta>
+
+    <presto:presto-meta name="macrotype">user</presto:presto-meta> 
+    <presto:presto-meta name="icon">salesforce.gif</presto:presto-meta> 
+    <presto:presto-meta name="help"> 
+        <description>
+            Salesforce Opportunity block retrieves matching Opportunity records for a given Account ID. 
+            If Account ID is not provided, retrieves all Opportunity records. 
+            Requires that you have already registered the Salesforce WSDL web service with the id of 'Salesforce'.
+        </description> 
+        <parameters> 
+            <parameter name="AccountId">A specific Account ID name to search Opportunity. If Account Id is not provided, retrieves all Opportunities.</parameter> 
+            <parameter name="Name">A person name to search Leads. If person name is not provided, retrieves all Leads.</parameter> 
+            <parameter name="MinimumAmount">Find leads with Amount at least equal to this minimum amount</parameter> 
+            <parameter name="MaximumAmount">Find leads with Amount less than or equal to this maximum amount</parameter> 
+            <parameter name="Fields">A comma separated list of valid field names for Opportunity. See Salesforce documentation.</parameter> 
+            <parameter name="LoginResponse">Response from a valid Salesforce login</parameter> 
+        </parameters> 
+    </presto:presto-meta>
+
+    <input name="AccountId" type="string" label="Account Id"/>
+
+    <input name="CompamyName" type="string" label="Company Name"/>
+
+    <input name="MinimumAmount" type="number" label="Minimum Amount"/>
+
+    <input name="MaximumAmount" type="number" label="Maximum Amount"/>
+
+    <input name="Fields" type="string" label="Comma separated list of Opportunity Fields"/>
+
+    <input name="LoginResponse" type="document" label="Salesforce Login Response"/>
+
+
+    <output name="oppresult" type="document"/>
+    
+    <variables>
+	<variable name="dynamicquery" type="string" default=" "/>
+        <variable name="basicFields" type="string" 
+              default="Id, Name, Description, Type, Amount, StageName, LeadSource, AccountId"/>
+        <variable name="allFields" type="string"
+              default="Id, AccountId, Amount, CampaignId, CloseDate, CreatedById, CreatedDate, Description, ExpectedRevenue, Fiscal, FiscalQuarter, FiscalYear, ForecastCategory, ForecastCategoryName, HasOpportunityLineItem, IsClosed, IsDeleted, IsPrivate, IsWon, LastActivityDate, LastModifiedById, LastModifiedDate, LeadSource, Name, NextStep, OwnerId, Pricebook2Id, Probability, StageName, SystemModstamp, TotalOpportunityQuantity, Type"/>
+    </variables>
+    
+<script type="text/javascript" inputvariables="Fields, basicFields, allFields, AccountId, CompamyName, MaximumAmount, MinimumAmount" outputvariable="dynamicquery">
+<![CDATA[
+	var selectclause = "Select " ;
+	if (Fields == 'all')
+		selectclause += allFields;
+        else if (Fields == 'basic')
+		selectclause += basicFields;
+	else if (Fields != '')
+		selectclause += Fields;
+	else 
+		selectclause += basicFields;
+
+	selectclause += ' from Opportunity';
+
+	var whereclause = " where ";
+	var andrequired = false;
+	if ( AccountId != '' ) {
+		whereclause += " AccountId = '" + AccountId + "'";
+		andrequired = true;
+	}
+	if ( CompamyName != '' ) {
+		if (andrequired) whereclause += " and ";
+		andrequired=true;
+		whereclause += " Name like '%" + CompamyName + "%'";
+	}
+	if ( MinimumAmount != '' ) {
+		if (andrequired) whereclause += " and ";
+		andrequired=true;
+		whereclause += " Amount >= " + MinimumAmount ;
+	}
+	if ( MaximumAmount != '' ) {
+		if (andrequired) whereclause += " and ";
+		andrequired=true;
+		whereclause += " Amount <= " + MaximumAmount ;
+	}
+
+      if (andrequired) {
+          dynamicquery = selectclause + whereclause;
+      } else {
+          dynamicquery = selectclause;
+      }
+]]>
+</script>
+
+    <!-- Build Request Header to invoke the Salesforce service
+            - using sessionId data returned from Login operation response
+                    i.e. {$LoginResponse//urn:sessionId/string()}
+            - using dynamic endpoint returned from Login operation response
+                    i.e. {$LoginResponse//urn:serverUrl/string()}
+    -->
+    <constructor outputvariable="requestheader">
+        <header>
+            <serviceEndpoint>{$LoginResponse//urn:serverUrl/string()}</serviceEndpoint>
+            <serviceHeader>
+                  <urn:SessionHeader>
+                     <urn:sessionId>{$LoginResponse//urn:sessionId/string()}</urn:sessionId>
+                  </urn:SessionHeader>
+            </serviceHeader>
+        </header>
+    </constructor>
+ 
+    <!-- Build Request payload for SalesForce query operation -->
+    <constructor outputvariable="accountrequest">
+          <urn:query>
+             <urn:queryString>{$dynamicquery}</urn:queryString>
+          </urn:query>
+    </constructor>
+ 
+    <!-- Invoke SalesForce query operation using the newly constructed request & header payloads  -->
+    <invoke service="Salesforce" operation="query"
+            inputvariables="accountrequest" outputvariable="oppresult" header="requestheader"/>
+
+</macro>
+
+
+<macro domain="Salesforce" name="ContactCreator"
+    xmlns="http://www.openmashup.org/schemas/v1.0/EMML"
+    xmlns:presto="http://www.jackbe.com/v1.0/EMMLPrestoExtensions"
+    xmlns:urn="urn:enterprise.soap.sforce.com"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+    <presto:presto-meta name="macrotype">user</presto:presto-meta> 
+    <presto:presto-meta name="icon">salesforce.gif</presto:presto-meta> 
+    <presto:presto-meta name="help"> 
+        <description>Creates a new Salesforce Contact object for the given AccountId
+        </description> 
+        <parameters> 
+            <parameter name="AccountId">A specific Account ID name to search Opportunity. If Account Id is not provided, retrieves all Opportunities.</parameter> 
+            <parameter name="FirstName">First Name for the new contact</parameter>
+            <parameter name="LastName">Last Name for the new contact</parameter>
+            <parameter name="Department">Department Name for the new contact</parameter>
+            <parameter name="Description">A brief description for the new contact</parameter>
+            <parameter name="Email">Email for the new contact</parameter>
+            <parameter name="Phone">Phone for the new contact</parameter>
+            <parameter name="MobilePhone">Mobile Phone for the new contact</parameter>
+            <parameter name="Fax">Fax for the new contact</parameter>
+            <parameter name="LoginResponse">Response from a valid Salesforce login</parameter> 
+        </parameters> 
+    </presto:presto-meta>
+
+
+    <output name="result" type="document"/>
+    <input default="001E0000002KiXJIA0" label="Account Id" name="AccountId" type="string"/>
+    <input default="Baba" label="First Name" name="FirstName" type="string"/>
+    <input default="Booyee" label="Last Name" name="LastName" type="string"/>
+    <input default="Finance" label="Department" name="Department" type="string"/>
+    <input default="" label="Description" name="Description" type="string"/>
+    <input default="" label="Email" name="Email" type="string"/>
+    <input default="" label="Phone" name="Phone" type="string"/>
+    <input default="" label="Mobile Phone" name="MobilePhone" type="string"/>
+    <input default="" label="Fax" name="Fax" type="string"/>
+
+    <input label="Salesforce Login Response" name="LoginResponse" type="document"/>
+
+    <variables>
+        <variable default="create" name="soapAction" type="string"/>
+        <variable name="soapHeader" type="document"/>
+        <variable name="soapBody" type="document"/>
+        <variable name="soapEnvelope" type="document"/>
+    </variables>
+
+
+    <!-- Build SF Create Request -->
+    <constructor outputvariable="soapBody">
+        <urn:create>
+            <urn:sObjects xsi:type="urn1:Contact">
+                <AccountId>{$AccountId}</AccountId>
+                <FirstName>{$FirstName}</FirstName>
+                <LastName>{$LastName}</LastName>
+                <Department>{$Department}</Department>
+                <Description>{$Description}</Description>
+                <Email>{$Email}</Email>
+                <Phone>{$Phone}</Phone>
+                <MobilePhone>{$MobilePhone}</MobilePhone>
+                <Fax>{$Fax}</Fax>
+            </urn:sObjects>
+        </urn:create>
+    </constructor>
+  
+    <constructor outputvariable="soapHeader">
+        <urn:SessionHeader>
+            <urn:sessionId>{$LoginResponse//urn:sessionId/string()}</urn:sessionId>
+        </urn:SessionHeader>
+    </constructor>
+
+    <constructor outputvariable="soapRequest">
+        <soap:Envelope xmlns:enc="http://schemas.xmlsoap.org/soap/encoding" 
+            xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" 
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                <soap:Header>
+                    {$soapHeader}
+                </soap:Header>
+                <soap:Body>
+                    {$soapBody}
+                </soap:Body>
+        </soap:Envelope>
+    </constructor>
+
+
+    <constructor outputvariable="httpHeader">
+        <headers>
+            <SOAPAction>{$soapAction}</SOAPAction>
+            <Content-type>text/xml</Content-type>
+        </headers>
+    </constructor>
+
+    <template expr="{$LoginResponse//urn:serverUrl/string()}" outputvariable="soapEndpoint"/>
+
+    <directinvoke endpoint="$soapEndpoint" header="$httpHeader" method="post" outputvariable="result" requestbody="$soapRequest"/>
+
+</macro>
+
+
+</macros>
